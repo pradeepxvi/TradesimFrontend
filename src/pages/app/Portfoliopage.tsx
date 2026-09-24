@@ -253,12 +253,6 @@ const MetricCard = ({
     </div>
 );
 
-export interface PortfolioHolding {
-    symbol: string;
-    market_value?: number | string;
-    [key: string]: unknown;
-}
-
 export const PortfolioChart = ({
     holdings = [],
 }: {
