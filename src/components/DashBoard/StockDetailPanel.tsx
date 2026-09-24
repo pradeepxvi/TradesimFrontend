@@ -490,7 +490,7 @@ const StockStatistics = ({
             <h2 className="text-sm font-semibold text-slate-100">
                 Stock statistics
             </h2>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="mt-4 grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 <Metric label="Last traded price" value={`Rs ${stock.ltp}`} />
                 <Metric label="Open" value={formatValue(stock.open)} />
                 <Metric label="High" value={formatValue(stock.high)} />
@@ -534,10 +534,10 @@ const Metric = ({
     value: string;
     tone?: "positive" | "negative" | "neutral";
 }) => (
-    <div className="rounded-lg border border-slate-800 bg-[#1b222c] p-4">
-        <p className="text-xs text-slate-500">{label}</p>
+    <div className="min-w-0 overflow-hidden rounded-lg border border-slate-800 bg-[#1b222c] p-3 sm:p-4">
+        <p className="truncate text-xs text-slate-500">{label}</p>
         <p
-            className={`mt-2 font-mono text-lg font-semibold ${tone === "positive" ? "text-emerald-400" : tone === "negative" ? "text-red-400" : "text-slate-100"}`}
+            className={`mt-2 break-words font-mono text-base font-semibold leading-tight sm:text-lg ${tone === "positive" ? "text-emerald-400" : tone === "negative" ? "text-red-400" : "text-slate-100"}`}
         >
             {value}
         </p>
