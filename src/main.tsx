@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { Component, type ErrorInfo, type ReactNode } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
