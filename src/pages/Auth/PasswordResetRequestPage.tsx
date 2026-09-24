@@ -9,7 +9,7 @@ import { getFieldError, normalizeApiError } from "../../utils/error";
 function PasswordResetRequestPage() {
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("pradeep@gmail.com");
+    const [email, setEmail] = useState("");
     const [error, setError] = useState("");
 
     const mutation = useMutation({

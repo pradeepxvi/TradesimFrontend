@@ -155,7 +155,6 @@ const RegisterForm = ({
                 </div>
 
                 {/* Password */}
-                <p>password is adminadmin so you don't have to type</p>
                 <div className="w-full">
                     <label
                         htmlFor="password"

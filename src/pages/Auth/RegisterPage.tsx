@@ -14,8 +14,8 @@ const RegisterPage = () => {
     const [formData, setFormData] = useState<RegisterData>({
         full_name: "",
         email: "",
-        password: "adminadmin",
-        password_confirmation: "adminadmin",
+        password: "",
+        password_confirmation: "",
     });
 
     const [errors, setErrors] = useState<Record<string, string[]>>({});
