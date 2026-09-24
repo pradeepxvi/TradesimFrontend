@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+.theme-dark {
+    background: #0d1117;
+}
+
+.theme-light {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.theme-light .bg-\[\#151a21\] {
+    background-color: #ffffff;
+}
+
+.theme-light .bg-\[\#1b222c\] {
+    background-color: #f8fafc;
+}
+
+.theme-light .bg-\[\#0d1117\] {
+    background-color: #f1f5f9;
+}
+
+.theme-light .text-white {
+    color: #0f172a;
+}
+
+.theme-light .text-slate-100,
+.theme-light .text-slate-200 {
+    color: #1e293b;
+}
+
+.theme-light .text-slate-300 {
+    color: #334155;
+}
+
+.theme-light .text-slate-400,
+.theme-light .text-slate-500 {
+    color: #64748b;
+}
+
+.theme-light .border-slate-800 {
+    border-color: #e2e8f0;
+}
+
+.theme-light .hover\:bg-slate-800:hover {
+    background-color: #e2e8f0;
+}
+
+.theme-light .bg-\[\#10151b\] {
+    background-color: #f8fafc;
+}
+
+.theme-light .bg-black\/60 {
+    background-color: rgb(15 23 42 / 0.35);
+}
+
+.theme-light header,
+.theme-light aside {
+    background-color: #ffffff;
+    border-color: #e2e8f0;
+}
+
+.theme-light input,
+.theme-light button[class*="border-slate-800"] {
+    border-color: #cbd5e1;
+}
+
+.theme-light input {
+    color: #1e293b;
+}
+
+.theme-light input::placeholder {
+    color: #94a3b8;
+}
