@@ -83,13 +83,29 @@ const VerifyOTPForm = ({
                     {isLoading ? "Verifying..." : "Verify Email"}
                 </button>
                 {/* Verify */}
-                <div className="flex justify-end">
-                    <Link
-                        to="/resend-otp"
-                        className="text-sm text-blue-500 hover:text-blue-400 transition"
-                    >
-                        Request new OTP
-                    </Link>
+                <div className="flex justify-between">
+                    <div className="text-center">
+                        <p className="text-sm sm:text-[15px] text-[#657892]">
+                            Back To{" "}
+                            <Link
+                                to="/login"
+                                className="text-blue-500 hover:text-blue-400 transition"
+                            >
+                                Login
+                            </Link>
+                        </p>
+                    </div>
+
+                    <div className="text-center">
+                        <p className="text-sm sm:text-[15px] text-[#657892]">
+                            <Link
+                                to="/resend-otp"
+                                className="text-blue-500 hover:text-blue-400 transition"
+                            >
+                                Request new OTP
+                            </Link>
+                        </p>
+                    </div>
                 </div>
             </form>
         </div>

@@ -20,6 +20,7 @@ import {
 import { useRef, useState } from "react";
 import useMarket from "../../context/useMarket";
 import type { Candle, CompanyQuote } from "../../types/market";
+import { getStoredUser } from "../../utils/session";
 
 interface StockDetailPanelProps {
     symbol: string;
@@ -28,6 +29,7 @@ interface StockDetailPanelProps {
     hasError: boolean;
     onBack: () => void;
 }
+const user = getStoredUser();
 
 const StockDetailPanel = ({
     symbol,
@@ -50,11 +52,12 @@ const StockDetailPanel = ({
         staleTime: 30_000,
     });
     const queryClient = useQueryClient();
+
     const watchlistQuery = useQuery({
         queryKey: ["watchlist"],
         queryFn: Watchlist,
         staleTime: 30_000,
-        enabled: Boolean(stock),
+        enabled: Boolean(stock && user?.access),
     });
     const watchlistMutation = useMutation({
         mutationFn: async (watched: boolean) => {
@@ -404,6 +407,7 @@ const OrderPanel = ({
         queryKey: ["wallet"],
         queryFn: Wallet,
         staleTime: 30_000,
+        enabled: Boolean(user?.access),
     });
     const orderMutation = useMutation({
         mutationFn: CreateOrder,

@@ -190,7 +190,7 @@ const LoginForm = ({
                         transition
                     "
                 >
-                    {isLoading ? "Signing in..." : "Sign in"}
+                    {isLoading ? "Signing in..." : "Login"}
                 </button>
             </form>
 

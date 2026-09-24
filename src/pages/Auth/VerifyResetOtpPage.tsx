@@ -94,7 +94,7 @@ function VerifyResetOtp() {
                             to="/login"
                             className="text-blue-500 hover:text-blue-400 transition"
                         >
-                            Sign in
+                            Login
                         </Link>
                     </p>
                 </div>

@@ -85,7 +85,7 @@ const getUserFacingMessage = (
     }
 
     if (status === 401) {
-        return "Your session has expired. Please sign in again to continue.";
+        return "Your session has expired. Please Login again to continue.";
     }
 
     if (status === 403) {

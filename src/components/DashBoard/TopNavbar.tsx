@@ -209,7 +209,7 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
                             onClick={() => navigate("/login")}
                             className="ml-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-500"
                         >
-                            Sign in
+                            Login
                         </button>
                     )}
                 </div>

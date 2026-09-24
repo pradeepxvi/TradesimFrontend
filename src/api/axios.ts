@@ -67,8 +67,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
-// baseURL: "https://tb.pradipkunwar.name.np/api/v1",
-// baseURL: "https://tradesimbackend.onrender.com/api/v1",
-// baseURL: "http://127.0.0.1:8000/api/v1/",
-// baseURL: "http://192.168.18.5:8000/api/v1",

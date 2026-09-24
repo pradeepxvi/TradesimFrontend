@@ -54,17 +54,17 @@ const mainNavigation = [
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const navigate = useNavigate();
 
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        navigate("/login");
+    };
+
     const user = getStoredUser();
     const navigation = user
         ? mainNavigation
         : mainNavigation.filter((item) =>
               ["/market", "/stocks"].includes(item.path),
           );
-
-    const handleLogout = () => {
-        localStorage.clear();
-        navigate("/login");
-    };
 
     return (
         <>
@@ -201,7 +201,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                             onClick={() => navigate("/login")}
                             className="w-full rounded-xl bg-blue-600 px-3 py-3 text-sm font-medium text-white hover:bg-blue-500"
                         >
-                            Sign in to TradeSim
+                            Login to TradeSim
                         </button>
                     )}
                 </div>

@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { LoginResponse } from "../types/auth";
 
 export const getStoredUser = (): LoginResponse | null => {
@@ -15,8 +16,4 @@ export const getStoredUser = (): LoginResponse | null => {
 
 export const saveStoredUser = (user: LoginResponse) => {
     localStorage.setItem("user", JSON.stringify(user));
-};
-
-export const clearStoredUser = () => {
-    localStorage.removeItem("user");
 };

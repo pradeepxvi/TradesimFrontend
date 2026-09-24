@@ -112,12 +112,12 @@ function ResetPassword() {
             {/* Login */}
             <div className="text-center mt-6">
                 <p className="text-sm sm:text-[15px] text-[#657892]">
-                    Back To
+                    Back To{" "}
                     <Link
                         to="/login"
                         className="text-blue-500 hover:text-blue-400 transition"
                     >
-                        Sign in
+                        Login
                     </Link>
                 </p>
             </div>
