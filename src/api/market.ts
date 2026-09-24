@@ -101,3 +101,8 @@ export const Watchlist = async (): Promise<WatchlistItem[]> => {
     const response = await api.get<WatchlistItem[]>("/watchlist/");
     return response.data;
 };
+
+export const NepseCandles = async (): Promise<Candle[]> => {
+    const response = await api.get("market/indices/nepse/candles/");
+    return response.data;
+};

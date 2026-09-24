@@ -253,96 +253,196 @@ const MetricCard = ({
     </div>
 );
 
-const PortfolioChart = ({ holdings }: { holdings: PortfolioHolding[] }) => {
-    const width = 800;
-    const chartTop = 18;
-    const chartBottom = 190;
-    const chartHoldings = holdings.flatMap((holding) => {
+export interface PortfolioHolding {
+    symbol: string;
+    market_value?: number | string;
+    [key: string]: unknown;
+}
+
+export const PortfolioChart = ({
+    holdings = [],
+}: {
+    holdings?: PortfolioHolding[];
+}) => {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    const svgWidth = 800;
+    const svgHeight = 260;
+
+    // Increased padding so labels and circles don't get cut off
+    const padding = { top: 35, right: 30, bottom: 40, left: 65 };
+    const chartWidth = svgWidth - padding.left - padding.right;
+    const chartHeight = svgHeight - padding.top - padding.bottom;
+
+    const safeHoldings = Array.isArray(holdings) ? holdings : [];
+
+    const chartHoldings = safeHoldings.flatMap((holding) => {
         const value = toFiniteNumber(holding.market_value);
         return value === null ? [] : [{ holding, value }];
     });
+
     const values = chartHoldings.map(({ value }) => value);
-    const maximum = Math.max(...values, 1);
+    const maximum = Math.max(...values, 100);
     const minimum = Math.min(...values, 0);
     const valueRange = maximum - minimum || 1;
-    const points = values.map((value, index) => ({
-        x:
+
+    const points = values.map((value, index) => {
+        const x =
             values.length === 1
-                ? width / 2
-                : (index / (values.length - 1)) * width,
-        y:
-            chartBottom -
-            ((value - minimum) / valueRange) * (chartBottom - chartTop),
-    }));
-    const line = points.map((point) => `${point.x},${point.y}`).join(" ");
-    const area = points.length
-        ? `0,${chartBottom} ${line} ${width},${chartBottom}`
+                ? padding.left + chartWidth / 2
+                : padding.left + (index / (values.length - 1)) * chartWidth;
+        const y =
+            padding.top +
+            chartHeight -
+            ((value - minimum) / valueRange) * chartHeight;
+        return { x, y, value };
+    });
+
+    const linePoints = points.map((p) => `${p.x},${p.y}`).join(" ");
+
+    // Closed polygon path for area fill
+    const areaPoints = points.length
+        ? `${padding.left},${padding.top + chartHeight} ${linePoints} ${
+              padding.left + (values.length === 1 ? chartWidth / 2 : chartWidth)
+          },${padding.top + chartHeight}`
         : "";
+
     return (
-        <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#151a21]">
+        <section className="overflow-hidden rounded-xl border border-slate-800 bg-[#151a21] shadow-lg">
             <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
                 <div>
                     <h2 className="text-sm font-semibold text-slate-100">
                         Portfolio Value
                     </h2>
-                    <p className="mt-1 text-[11px] text-slate-600">
+                    <p className="mt-0.5 text-[11px] text-slate-400">
                         Current value by holding
                     </p>
                 </div>
             </div>
+
             {points.length === 0 ? (
                 <div className="flex h-64 items-center justify-center text-xs text-slate-500">
-                    Add holdings to see portfolio value.
+                    Add holdings with market value to see chart.
                 </div>
             ) : (
-                <div className="p-4">
+                <div className="p-2 sm:p-4">
                     <svg
-                        viewBox="0 0 800 230"
-                        className="h-64 w-full"
+                        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                        className="h-64 sm:h-72 w-full overflow-visible"
                         role="img"
                         aria-label="Portfolio value by holding"
                     >
-                        {[0, 1, 2, 3].map((lineIndex) => (
-                            <line
-                                key={lineIndex}
-                                x1="0"
-                                x2={width}
-                                y1={chartTop + lineIndex * 57}
-                                y2={chartTop + lineIndex * 57}
-                                stroke="#26313d"
-                                strokeDasharray="3 4"
+                        {/* Grid Lines & Y-Axis Value Labels */}
+                        {[0, 0.33, 0.66, 1].map((ratio, index) => {
+                            const y = padding.top + chartHeight * ratio;
+                            const gridValue = maximum - valueRange * ratio;
+                            return (
+                                <g key={index}>
+                                    <line
+                                        x1={padding.left}
+                                        x2={svgWidth - padding.right}
+                                        y1={y}
+                                        y2={y}
+                                        stroke="#26313d"
+                                        strokeDasharray="3 4"
+                                    />
+                                    <text
+                                        x={padding.left - 8}
+                                        y={y + 3}
+                                        fill="#64748b"
+                                        fontSize="10"
+                                        textAnchor="end"
+                                        className="font-mono"
+                                    >
+                                        {gridValue}
+                                    </text>
+                                </g>
+                            );
+                        })}
+
+                        {/* Area Fill */}
+                        {areaPoints && (
+                            <polygon
+                                points={areaPoints}
+                                fill="#2563eb"
+                                opacity="0.12"
                             />
-                        ))}
-                        <polygon points={area} fill="#2563eb" opacity="0.12" />
+                        )}
+
+                        {/* Chart Line */}
                         <polyline
-                            points={line}
+                            points={linePoints}
                             fill="none"
                             stroke="#3b82f6"
                             strokeWidth="2.5"
                             strokeLinejoin="round"
                             strokeLinecap="round"
                         />
-                        {points.map((point, index) => (
-                            <g key={chartHoldings[index].holding.symbol}>
-                                <circle
-                                    cx={point.x}
-                                    cy={point.y}
-                                    r="4"
-                                    fill="#151a21"
-                                    stroke="#60a5fa"
-                                    strokeWidth="2"
-                                />
-                                <text
-                                    x={point.x}
-                                    y="215"
-                                    textAnchor="middle"
-                                    fill="#64748b"
-                                    fontSize="10"
+
+                        {/* Data Points, Values & Symbols */}
+                        {points.map((point, index) => {
+                            const item = chartHoldings[index];
+                            const isHovered = hoveredIndex === index;
+
+                            return (
+                                <g
+                                    key={item.holding.symbol || index}
+                                    onMouseEnter={() => setHoveredIndex(index)}
+                                    onMouseLeave={() => setHoveredIndex(null)}
+                                    className="cursor-pointer transition-all"
                                 >
-                                    {chartHoldings[index].holding.symbol}
-                                </text>
-                            </g>
-                        ))}
+                                    {/* Vertical guide line on hover */}
+                                    {isHovered && (
+                                        <line
+                                            x1={point.x}
+                                            x2={point.x}
+                                            y1={padding.top}
+                                            y2={padding.top + chartHeight}
+                                            stroke="#3b82f6"
+                                            strokeDasharray="2 2"
+                                            opacity="0.5"
+                                        />
+                                    )}
+
+                                    {/* Data Circle Point */}
+                                    <circle
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r={isHovered ? "6" : "4.5"}
+                                        fill="#151a21"
+                                        stroke={
+                                            isHovered ? "#60a5fa" : "#3b82f6"
+                                        }
+                                        strokeWidth={isHovered ? "3" : "2"}
+                                    />
+
+                                    {/* Always-Visible Value Label above point */}
+                                    <text
+                                        x={point.x}
+                                        y={point.y - 10}
+                                        textAnchor="middle"
+                                        fill={isHovered ? "#93c5fd" : "#cbd5e1"}
+                                        fontSize="10"
+                                        fontWeight="600"
+                                        className="font-mono transition-colors"
+                                    >
+                                        {point.value}
+                                    </text>
+
+                                    {/* Symbol Label below X-Axis */}
+                                    <text
+                                        x={point.x}
+                                        y={svgHeight - 12}
+                                        textAnchor="middle"
+                                        fill={isHovered ? "#60a5fa" : "#64748b"}
+                                        fontSize="11"
+                                        fontWeight={isHovered ? "600" : "400"}
+                                    >
+                                        {item.holding.symbol}
+                                    </text>
+                                </g>
+                            );
+                        })}
                     </svg>
                 </div>
             )}

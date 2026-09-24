@@ -1,7 +1,9 @@
 import { BriefcaseBusiness, Wallet } from "lucide-react";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { Portfolio, Wallet as getWallet } from "../../api/market";
 import { sumNumericValues, toFiniteNumber } from "../../utils/finance";
+import { PortfolioChart } from "../../pages/app/Portfoliopage";
+import type { PortfolioHolding } from "../../types/market";
 
 const PortfolioPerformance = () => {
     const [portfolioQuery, walletQuery] = useQueries({
@@ -21,6 +23,12 @@ const PortfolioPerformance = () => {
         holdings.map((holding) => holding.unrealized_profit_loss),
     );
     const positive = totalProfitLoss !== null && totalProfitLoss >= 0;
+
+    const holding = useQuery({
+        queryFn: Portfolio,
+        queryKey: ["holdingss"],
+    });
+    const holding_data: PortfolioHolding[] | undefined = holding.data;
 
     return (
         <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#151a21]">
@@ -82,6 +90,7 @@ const PortfolioPerformance = () => {
                     </div>
                 )}
             </div>
+            <PortfolioChart holdings={holding_data || []} />
         </section>
     );
 };

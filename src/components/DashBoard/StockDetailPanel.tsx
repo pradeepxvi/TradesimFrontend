@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import {
     AddWatchlist,
     CompanyCandles,
@@ -21,7 +20,6 @@ import {
 import { useRef, useState } from "react";
 import useMarket from "../../context/useMarket";
 import type { Candle, CompanyQuote } from "../../types/market";
-import { getStoredUser } from "../../utils/session";
 
 interface StockDetailPanelProps {
     symbol: string;
@@ -39,7 +37,6 @@ const StockDetailPanel = ({
     onBack,
 }: StockDetailPanelProps) => {
     const { market_overview } = useMarket();
-    const authenticated = Boolean(getStoredUser());
     const candlesQuery = useQuery({
         queryKey: ["company-candles", stock?.symbol],
         queryFn: () => CompanyCandles(stock?.symbol ?? ""),
@@ -57,7 +54,7 @@ const StockDetailPanel = ({
         queryKey: ["watchlist"],
         queryFn: Watchlist,
         staleTime: 30_000,
-        enabled: Boolean(stock) && authenticated,
+        enabled: Boolean(stock),
     });
     const watchlistMutation = useMutation({
         mutationFn: async (watched: boolean) => {
@@ -110,15 +107,8 @@ const StockDetailPanel = ({
             <div className="flex items-center justify-between gap-4">
                 <BackButton onBack={onBack} />
                 <button
-                    disabled={authenticated && watchlistMutation.isPending}
-                    onClick={() => {
-                        if (!authenticated) {
-                            toast.info(
-                                "You need to be authenticated to use your watchlist.",
-                            );
-                            return;
-                        }
-
+                    disabled={watchlistMutation.isPending}
+                    onClick={() =>
                         watchlistMutation.mutate(
                             Boolean(
                                 watchlistQuery.data?.some(
@@ -127,20 +117,18 @@ const StockDetailPanel = ({
                                         stock.symbol.toUpperCase(),
                                 ),
                             ),
-                        );
-                    }}
+                        )
+                    }
                     className="flex items-center gap-2 rounded-md border border-slate-800 px-3 py-2 text-xs text-slate-400 hover:border-blue-500/50 hover:text-blue-300 disabled:opacity-50"
                 >
                     <Bookmark size={14} />
-                    {!authenticated
-                        ? "Sign in to use watchlist"
-                        : watchlistQuery.data?.some(
-                                (item) =>
-                                    item.symbol.toUpperCase() ===
-                                    stock.symbol.toUpperCase(),
-                            )
-                          ? "Remove from watchlist"
-                          : "Add to watchlist"}
+                    {watchlistQuery.data?.some(
+                        (item) =>
+                            item.symbol.toUpperCase() ===
+                            stock.symbol.toUpperCase(),
+                    )
+                        ? "Remove from watchlist"
+                        : "Add to watchlist"}
                 </button>
             </div>
 
@@ -189,11 +177,7 @@ const StockDetailPanel = ({
                         hasError={Boolean(candlesQuery.error)}
                     />
                 </div>
-                <OrderPanel
-                    symbol={stock.symbol}
-                    price={stock.ltp}
-                    authenticated={authenticated}
-                />
+                <OrderPanel symbol={stock.symbol} price={stock.ltp} />
             </div>
 
             <StockStatistics
@@ -204,14 +188,16 @@ const StockDetailPanel = ({
     );
 };
 
-const PriceChart = ({
+export const PriceChart = ({
     candles,
     isLoading,
     hasError,
+    label,
 }: {
     candles: Candle[];
     isLoading: boolean;
     hasError: boolean;
+    label?: string;
 }) => {
     const ranges = [
         { label: "1D", days: 1 },
@@ -231,7 +217,7 @@ const PriceChart = ({
                 <div className="flex items-center gap-2">
                     <BarChart3 size={16} className="text-blue-400" />
                     <h2 className="text-sm font-semibold text-slate-100">
-                        Price chart
+                        {label || "Price Chart"}
                     </h2>
                 </div>
                 <div className="flex gap-1 text-[10px] text-slate-600">
@@ -408,20 +394,16 @@ const CandlestickChart = ({ candles }: { candles: Candle[] }) => {
 const OrderPanel = ({
     symbol,
     price,
-    authenticated,
 }: {
     symbol: string;
     price: string | null;
-    authenticated: boolean;
 }) => {
     const [side, setSide] = useState<"BUY" | "SELL">("BUY");
     const [quantity, setQuantity] = useState(0);
-    const navigate = useNavigate();
     const walletQuery = useQuery({
         queryKey: ["wallet"],
         queryFn: Wallet,
         staleTime: 30_000,
-        enabled: authenticated,
     });
     const orderMutation = useMutation({
         mutationFn: CreateOrder,
@@ -476,28 +458,15 @@ const OrderPanel = ({
             <div className="mt-2 flex justify-between text-xs text-slate-500">
                 <span>Available cash</span>
                 <span className="font-mono">
-                    {authenticated
-                        ? `Rs ${Number(walletQuery.data?.virtual_balance ?? 0).toLocaleString("en-NP", { minimumFractionDigits: 2 })}`
-                        : "Sign in required"}
+                    Rs{" "}
+                    {Number(
+                        walletQuery.data?.virtual_balance ?? 0,
+                    ).toLocaleString("en-NP", { minimumFractionDigits: 2 })}
                 </span>
             </div>
             <button
-                disabled={
-                    !price ||
-                    orderMutation.isPending ||
-                    (authenticated && quantity < 1)
-                }
-                onClick={() => {
-                    if (!authenticated) {
-                        toast.info(
-                            "You need to be authenticated to place an order.",
-                        );
-                        navigate("/login");
-                        return;
-                    }
-
-                    orderMutation.mutate({ symbol, side, quantity });
-                }}
+                disabled={quantity < 1 || orderMutation.isPending || !price}
+                onClick={() => orderMutation.mutate({ symbol, side, quantity })}
                 className={`mt-4 h-9 w-full rounded-md text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-50 ${side === "BUY" ? "bg-emerald-600 hover:bg-emerald-500" : "bg-red-600 hover:bg-red-500"}`}
             >
                 {orderMutation.isPending
