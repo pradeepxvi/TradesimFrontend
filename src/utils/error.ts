@@ -23,9 +23,12 @@ const extractFieldErrors = (
         }
 
         if (Array.isArray(value)) {
-            const strings = value.filter(
-                (entry): entry is string => typeof entry === "string",
-            );
+            const strings = value
+                .map((entry) =>
+                    typeof entry === "string" ? entry : String(entry),
+                )
+                .filter((entry) => entry.trim().length > 0);
+
             if (strings.length > 0) {
                 fieldErrors[key] = strings;
             }
@@ -35,6 +38,25 @@ const extractFieldErrors = (
     }
 
     return Object.keys(fieldErrors).length > 0 ? fieldErrors : undefined;
+};
+
+const extractDetailMessage = (data: unknown): string | undefined => {
+    if (!isPlainObject(data)) return undefined;
+
+    if (typeof data.detail === "string") return data.detail;
+    if (typeof data.message === "string") return data.message;
+
+    if (
+        Array.isArray(data.non_field_errors) &&
+        typeof data.non_field_errors[0] === "string"
+    ) {
+        return data.non_field_errors[0];
+    }
+    if (typeof data.non_field_errors === "string") {
+        return data.non_field_errors;
+    }
+
+    return undefined;
 };
 
 const getUserFacingMessage = (
@@ -56,7 +78,10 @@ const getUserFacingMessage = (
     }
 
     if (status === 400) {
-        return "We couldn't process your request. Please check the information you entered and try again.";
+        return (
+            detail ||
+            "We couldn't process your request. Please check the information you entered and try again."
+        );
     }
 
     if (status === 401) {
@@ -98,12 +123,7 @@ export const normalizeApiError = (error: unknown): AppError => {
     if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         const data = error.response?.data;
-        const detail =
-            typeof data?.detail === "string"
-                ? data.detail
-                : typeof data?.message === "string"
-                  ? data.message
-                  : undefined;
+        const detail = extractDetailMessage(data);
 
         const fieldErrors = extractFieldErrors(data);
         const message = getUserFacingMessage(status, detail);
@@ -125,15 +145,16 @@ export const normalizeApiError = (error: unknown): AppError => {
     }
 
     if (error instanceof Error && error.message) {
-        const message =
-            error.message.toLowerCase().includes("network") ||
-            error.message.toLowerCase().includes("timeout") ||
-            error.message.toLowerCase().includes("failed to fetch")
-                ? "We couldn't reach TradeSim right now. Please check your internet connection and try again."
-                : "Something went wrong. Please try again.";
+        const lower = error.message.toLowerCase();
+        const isNetwork =
+            lower.includes("network") ||
+            lower.includes("timeout") ||
+            lower.includes("failed to fetch");
 
         return {
-            message,
+            message: isNetwork
+                ? "We couldn't reach TradeSim right now. Please check your internet connection and try again."
+                : "Something went wrong. Please try again.",
             retryable: true,
         };
     }

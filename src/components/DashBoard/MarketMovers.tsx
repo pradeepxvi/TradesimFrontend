@@ -36,10 +36,23 @@ const MarketMovers = ({ title = "Market movers" }: { title?: string }) => {
                     <div className="grid gap-5 sm:grid-cols-2">
                         <MoverList
                             title="Top gainers"
-                            stocks={data.gainers}
+                            stocks={[
+                                ...data.gainers.sort(
+                                    (a, b) =>
+                                        Number(b.change) - Number(a.change),
+                                ),
+                            ]}
                             positive
                         />
-                        <MoverList title="Top losers" stocks={data.losers} />
+                        <MoverList
+                            title="Top losers"
+                            stocks={[
+                                ...data.losers.sort(
+                                    (a, b) =>
+                                        Number(a.change) - Number(b.change),
+                                ),
+                            ]}
+                        />
                     </div>
                 )}
             </div>
@@ -63,6 +76,7 @@ const MoverList = ({
             {title}
         </h3>
         <div className="divide-y divide-slate-800">
+            Top gainers
             {stocks.slice(0, 8).map((stock) => (
                 <Link
                     key={stock.symbol}
@@ -89,8 +103,8 @@ const MoverList = ({
                             ) : (
                                 <ArrowDownRight size={12} />
                             )}
-                            {positive ? "+" : ""}
-                            {stock.change} ({stock.change_percent}%)
+                            {positive ? "+" : " "}
+                            {stock.change}
                         </p>
                     </div>
                 </Link>

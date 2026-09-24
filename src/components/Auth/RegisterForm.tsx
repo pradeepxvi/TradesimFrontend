@@ -39,7 +39,10 @@ const RegisterForm = ({
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Non field errors */}
                 {errors.non_field_errors?.map((error, index) => (
-                    <p key={index} className="text-sm text-red-400 break-words">
+                    <p
+                        key={index}
+                        className="mt-1.5 text-sm text-red-400 break-words"
+                    >
                         {error}
                     </p>
                 ))}
