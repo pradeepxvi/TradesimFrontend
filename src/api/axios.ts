@@ -2,7 +2,7 @@ import axios from "axios";
 import { getStoredUser } from "../utils/session";
 
 const api = axios.create({
-    baseURL: "https://0fe3-2405-acc0-1100-64b6-00-1.ngrok-free.app/api/v1/",
+    baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: 10_000,
     headers: {
         "Content-Type": "application/json",
