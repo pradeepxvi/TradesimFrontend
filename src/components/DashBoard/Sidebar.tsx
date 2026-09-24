@@ -55,9 +55,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const navigate = useNavigate();
 
     const user = getStoredUser();
-    if (!user) {
-        return;
-    }
+    const navigation = user
+        ? mainNavigation
+        : mainNavigation.filter((item) =>
+              ["/market", "/stocks"].includes(item.path),
+          );
 
     const handleLogout = () => {
         localStorage.clear();
@@ -114,7 +116,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
                 <nav className="flex-1 overflow-y-auto px-3 py-5">
                     <div className="space-y-1.5">
-                        {mainNavigation.map((item) => {
+                        {navigation.map((item) => {
                             const Icon = item.icon;
 
                             return (
@@ -168,39 +170,52 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 </nav>
 
                 <div className="border-t border-white/8 px-3 py-4">
-                    <NavLink
-                        to="/profile"
-                        onClick={onClose}
-                        className={({ isActive }) =>
-                            `group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "bg-blue-600/15 text-blue-400" : "text-slate-400 hover:bg-slate-800/80 hover:text-white"}`
-                        }
-                    >
-                        <UserRound
-                            size={18}
-                            className="text-slate-500 group-hover:text-slate-300"
-                        />
-                        <span>Profile</span>
-                    </NavLink>
-                    <button
-                        onClick={handleLogout}
-                        className="group mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
-                    >
-                        <LogOut
-                            size={18}
-                            className="text-slate-500 group-hover:text-red-400"
-                        />
-                        <span>Logout</span>
-                    </button>
+                    {user ? (
+                        <>
+                            <NavLink
+                                to="/profile"
+                                onClick={onClose}
+                                className={({ isActive }) =>
+                                    `group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "bg-blue-600/15 text-blue-400" : "text-slate-400 hover:bg-slate-800/80 hover:text-white"}`
+                                }
+                            >
+                                <UserRound
+                                    size={18}
+                                    className="text-slate-500 group-hover:text-slate-300"
+                                />
+                                <span>Profile</span>
+                            </NavLink>
+                            <button
+                                onClick={handleLogout}
+                                className="group mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-400 transition hover:bg-red-500/10 hover:text-red-400"
+                            >
+                                <LogOut
+                                    size={18}
+                                    className="text-slate-500 group-hover:text-red-400"
+                                />
+                                <span>Logout</span>
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="w-full rounded-xl bg-blue-600 px-3 py-3 text-sm font-medium text-white hover:bg-blue-500"
+                        >
+                            Sign in to TradeSim
+                        </button>
+                    )}
                 </div>
 
-                <div className="border-t border-white/8 px-4 py-3">
-                    <p className="truncate text-sm font-semibold text-slate-200">
-                        {user.user?.full_name || "User"}
-                    </p>
-                    <p className="truncate pt-1 text-[11px] text-slate-500">
-                        {user.user?.email || ""}
-                    </p>
-                </div>
+                {user && (
+                    <div className="border-t border-white/8 px-4 py-3">
+                        <p className="truncate text-sm font-semibold text-slate-200">
+                            {user.user?.full_name || "User"}
+                        </p>
+                        <p className="truncate pt-1 text-[11px] text-slate-500">
+                            {user.user?.email || ""}
+                        </p>
+                    </div>
+                )}
             </aside>
         </>
     );

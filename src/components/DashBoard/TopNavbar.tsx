@@ -32,9 +32,6 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
         ) || 0;
 
     const user = getStoredUser();
-    if (!user) {
-        return;
-    }
     const themes = [
         { value: "dark" as const, label: "Dark", icon: Moon },
         { value: "light" as const, label: "Light", icon: Sun },
@@ -203,9 +200,18 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
                         </span>
                     </div>
 
-                    <button className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]">
-                        {user.user?.full_name.charAt(0).toUpperCase()}
-                    </button>
+                    {user ? (
+                        <button className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]">
+                            {user.user?.full_name.charAt(0).toUpperCase()}
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="ml-1 rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-500"
+                        >
+                            Sign in
+                        </button>
+                    )}
                 </div>
             </div>
         </header>
