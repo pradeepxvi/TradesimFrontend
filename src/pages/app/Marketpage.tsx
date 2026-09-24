@@ -20,7 +20,7 @@ const Marketpage = () => {
 
             <MarketOverview title="Market overview" />
 
-            <div className="grid gap-4 xl:grid-cols-3">
+            <div className="grid gap-4  xl:grid-cols-3">
                 <SectorPerformance />
                 <div className="xl:col-span-2">
                     <MarketMovers title="Stock movers" />
