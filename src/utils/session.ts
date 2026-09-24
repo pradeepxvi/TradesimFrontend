@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import type { LoginResponse } from "../types/auth";
 
 export const getStoredUser = (): LoginResponse | null => {
