@@ -14,12 +14,12 @@ export interface IncidesData {
 }
 
 export interface MarketSummaryData {
-    total_turnover: string | null;
-    total_transactions: number | null;
+    total_turnover?: string | null;
+    total_transactions?: number | null;
     total_volume?: number | null;
-    advances: number | null;
-    declines: number | null;
-    unchanged: number | null;
+    advances?: number | null;
+    declines?: number | null;
+    unchanged?: number | null;
 }
 
 export interface StockSummaryData {
@@ -31,7 +31,7 @@ export interface StockSummaryData {
 
 export interface MarketOverviewData {
     market_status: MarketStatusResponse;
-    market_summary: MarketSummaryData;
+    market_summary?: MarketSummaryData;
     stock_summary: StockSummaryData;
     indices: IncidesData[];
     top_gainers?: GainerLooserStockData[];

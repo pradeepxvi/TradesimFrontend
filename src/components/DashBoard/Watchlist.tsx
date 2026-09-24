@@ -22,9 +22,21 @@ const Watchlist = () => {
                 {isLoading ? (
                     <div className="h-20 animate-pulse rounded-lg bg-slate-800/70" />
                 ) : isError ? (
-                    <p className="text-sm text-slate-500">
-                        Watchlist information is unavailable right now.
-                    </p>
+                    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-slate-300">
+                        <p className="font-medium text-amber-300">
+                            Unable to load your watchlist
+                        </p>
+                        <p className="mt-1 text-slate-400">
+                            We couldn't reach your saved stocks right now.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => window.location.reload()}
+                            className="mt-3 rounded-xl bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-200 hover:bg-amber-500/20"
+                        >
+                            Retry
+                        </button>
+                    </div>
                 ) : !data || data.length === 0 ? (
                     <p className="text-sm text-slate-500">
                         Your watchlist is empty.

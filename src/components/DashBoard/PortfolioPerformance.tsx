@@ -1,6 +1,7 @@
 import { BriefcaseBusiness, Wallet } from "lucide-react";
 import { useQueries } from "@tanstack/react-query";
 import { Portfolio, Wallet as getWallet } from "../../api/market";
+import { sumNumericValues, toFiniteNumber } from "../../utils/finance";
 
 const PortfolioPerformance = () => {
     const [portfolioQuery, walletQuery] = useQueries({
@@ -13,15 +14,13 @@ const PortfolioPerformance = () => {
     const loading = portfolioQuery.isLoading || walletQuery.isLoading;
     const error = portfolioQuery.isError || walletQuery.isError;
     const holdings = portfolioQuery.data ?? [];
-    const totalValue = holdings.reduce(
-        (total, holding) => total + Number(holding.market_value || 0),
-        0,
+    const totalValue = sumNumericValues(
+        holdings.map((holding) => holding.market_value),
     );
-    const totalProfitLoss = holdings.reduce(
-        (total, holding) => total + Number(holding.unrealized_profit_loss || 0),
-        0,
+    const totalProfitLoss = sumNumericValues(
+        holdings.map((holding) => holding.unrealized_profit_loss),
     );
-    const positive = totalProfitLoss >= 0;
+    const positive = totalProfitLoss !== null && totalProfitLoss >= 0;
 
     return (
         <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#151a21]">
@@ -35,9 +34,21 @@ const PortfolioPerformance = () => {
                 {loading ? (
                     <div className="h-32 animate-pulse rounded-lg bg-slate-800/70" />
                 ) : error ? (
-                    <p className="text-sm text-slate-500">
-                        Portfolio information is unavailable right now.
-                    </p>
+                    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-slate-300">
+                        <p className="font-medium text-amber-300">
+                            Unable to load your portfolio
+                        </p>
+                        <p className="mt-1 text-slate-400">
+                            Please try again in a moment.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => window.location.reload()}
+                            className="mt-3 rounded-xl bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-200 hover:bg-amber-500/20"
+                        >
+                            Retry
+                        </button>
+                    </div>
                 ) : (
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         <Metric
@@ -46,8 +57,14 @@ const PortfolioPerformance = () => {
                         />
                         <Metric
                             label="Unrealized P/L"
-                            value={`${positive ? "+" : ""}${formatAmount(totalProfitLoss)}`}
-                            tone={positive ? "positive" : "negative"}
+                            value={formatSignedAmount(totalProfitLoss)}
+                            tone={
+                                totalProfitLoss === null
+                                    ? "neutral"
+                                    : positive
+                                      ? "positive"
+                                      : "negative"
+                            }
                         />
                         <Metric
                             label="Holdings"
@@ -56,7 +73,9 @@ const PortfolioPerformance = () => {
                         <Metric
                             label="Available balance"
                             value={formatAmount(
-                                Number(walletQuery.data?.virtual_balance ?? 0),
+                                toFiniteNumber(
+                                    walletQuery.data?.virtual_balance,
+                                ),
                             )}
                             icon
                         />
@@ -91,7 +110,14 @@ const Metric = ({
     </div>
 );
 
-const formatAmount = (value: number) =>
-    `Rs ${value.toLocaleString("en-NP", { maximumFractionDigits: 2 })}`;
+const formatAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `Rs ${value.toLocaleString("en-NP", { maximumFractionDigits: 2 })}`;
+
+const formatSignedAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `${value >= 0 ? "+" : "-"}${formatAmount(Math.abs(value))}`;
 
 export default PortfolioPerformance;

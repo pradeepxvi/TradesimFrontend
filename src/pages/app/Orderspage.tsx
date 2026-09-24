@@ -1,6 +1,7 @@
 import { Check, Eye, LoaderCircle, Plus, X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { CancelOrder, CreateOrder, Orders } from "../../api/market";
 import type { Order, OrderCreate } from "../../types/market";
 
@@ -23,6 +24,10 @@ const Orderspage = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["orders"] });
             setMessage("Order cancelled successfully.");
+            toast.success("Order cancelled successfully.");
+        },
+        onError: () => {
+            toast.error("Could not cancel this order.");
         },
     });
     const createMutation = useMutation({
@@ -31,6 +36,10 @@ const Orderspage = () => {
             queryClient.invalidateQueries({ queryKey: ["orders"] });
             setIsNewOrderOpen(false);
             setMessage("New order created successfully.");
+            toast.success("New order created successfully.");
+        },
+        onError: () => {
+            toast.error("Could not create the order.");
         },
     });
 
@@ -169,7 +178,6 @@ const OrdersTable = ({
                         "Order ID",
                         "Symbol",
                         "Side",
-                        "Type",
                         "Qty",
                         "Price",
                         "Filled",
@@ -208,7 +216,6 @@ const OrdersTable = ({
                                     {order.side}
                                 </span>
                             </td>
-                            <td className="px-4 py-3 text-slate-500">MARKET</td>
                             <td className="px-4 py-3 font-mono text-slate-300">
                                 {order.quantity}
                             </td>

@@ -1,10 +1,11 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import { toast } from "react-toastify";
 import VerifyOTPForm from "../../components/Auth/VerifyOTPForm";
 import type { VerifyOTPData } from "../../types/auth";
 import { VerifyOTP } from "../../api/auth";
+import { getFieldError, normalizeApiError } from "../../utils/error";
 
 const VerifyOTPPage = () => {
     const navigate = useNavigate();
@@ -24,19 +25,16 @@ const VerifyOTPPage = () => {
 
         onSuccess: () => {
             setErrors("");
+            toast.success("Email verified successfully. You can now log in.");
             navigate("/login");
         },
 
         onError: (error: unknown) => {
-            if (axios.isAxiosError(error)) {
-                const data = error.response?.data;
-
-                console.log("Verify email error:", error.response);
-                setErrors(data?.detail);
-                console.log(data?.detail);
-            } else {
-                setErrors("Something went wrong.");
-            }
+            const appError = normalizeApiError(error);
+            const fieldError =
+                getFieldError(appError.fieldErrors, "otp") ?? appError.message;
+            setErrors(fieldError);
+            toast.error(appError.message);
         },
     });
 

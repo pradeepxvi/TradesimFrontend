@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
+import { toast } from "react-toastify";
 import RegisterForm from "../../components/Auth/RegisterForm";
 import type { RegisterData } from "../../types/auth";
 import { RegisterUser } from "../../api/auth";
+import { normalizeApiError, getFirstFormError } from "../../utils/error";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -24,6 +25,9 @@ const RegisterPage = () => {
 
         onSuccess: () => {
             setErrors({});
+            toast.success(
+                "Registration successful. Please check your email for the OTP code.",
+            );
             navigate("/verify-otp", {
                 state: {
                     email: formData.email,
@@ -32,21 +36,15 @@ const RegisterPage = () => {
         },
 
         onError: (error: unknown) => {
-            if (axios.isAxiosError(error)) {
-                const data = error.response?.data;
+            const appError = normalizeApiError(error);
+            const formError = getFirstFormError(appError.fieldErrors);
 
-                console.log("Register error:", error.response);
-
-                setErrors(
-                    data ?? {
-                        form: ["Something went wrong."],
-                    },
-                );
-            } else {
-                setErrors({
-                    form: ["Something went wrong."],
-                });
-            }
+            setErrors(
+                appError.fieldErrors ?? {
+                    form: [formError ?? appError.message],
+                },
+            );
+            toast.error(appError.message);
         },
     });
 

@@ -5,6 +5,7 @@ import { ChangePassword } from "../../api/auth";
 import { Orders, Portfolio } from "../../api/market";
 import type { ChangePasswordData } from "../../types/auth";
 import { getStoredUser } from "../../utils/session";
+import { sumNumericValues } from "../../utils/finance";
 
 const Profilepage = () => {
     const session = getStoredUser() ?? undefined;
@@ -30,13 +31,11 @@ const Profilepage = () => {
     });
     const holdings = portfolioQuery.data ?? [];
     const orders = ordersQuery.data ?? [];
-    const portfolioValue = holdings.reduce(
-        (total, holding) => total + Number(holding.market_value || 0),
-        0,
+    const portfolioValue = sumNumericValues(
+        holdings.map((holding) => holding.market_value),
     );
-    const totalProfitLoss = holdings.reduce(
-        (total, holding) => total + Number(holding.unrealized_profit_loss || 0),
-        0,
+    const totalProfitLoss = sumNumericValues(
+        holdings.map((holding) => holding.unrealized_profit_loss),
     );
     const completedOrders = orders.filter(
         (order) => order.status === "EXECUTED",
@@ -95,10 +94,6 @@ const Profilepage = () => {
                         label="Email Address"
                         value={user?.email || "-"}
                     />
-                    <ProfileField
-                        label="Member Since"
-                        value="Available after profile sync"
-                    />
                 </div>
             </section>
             <section className="rounded-lg border border-slate-800 bg-[#151a21] p-5">
@@ -113,8 +108,14 @@ const Profilepage = () => {
                     />
                     <Stat
                         label="Total P/L"
-                        value={`${totalProfitLoss >= 0 ? "+" : "-"}${formatAmount(Math.abs(totalProfitLoss))}`}
-                        tone={totalProfitLoss >= 0 ? "positive" : "negative"}
+                        value={formatSignedAmount(totalProfitLoss)}
+                        tone={
+                            totalProfitLoss === null
+                                ? "neutral"
+                                : totalProfitLoss >= 0
+                                  ? "positive"
+                                  : "negative"
+                        }
                     />
                     <Stat
                         label="Completed"
@@ -181,8 +182,15 @@ const Stat = ({
         </p>
     </div>
 );
-const formatAmount = (value: number) =>
-    `Rs ${value.toLocaleString("en-NP", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `Rs ${value.toLocaleString("en-NP", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const formatSignedAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `${value >= 0 ? "+" : "-"}${formatAmount(Math.abs(value))}`;
 
 const ChangePasswordDialog = ({
     onClose,

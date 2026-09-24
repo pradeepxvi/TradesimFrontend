@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { resetPassword } from "../../api/auth";
 import type { PasswordResetData } from "../../types/auth";
+import { getFieldError, normalizeApiError } from "../../utils/error";
 
 function ResetPassword() {
     const navigate = useNavigate();
@@ -19,24 +21,20 @@ function ResetPassword() {
         onSuccess: () => {
             localStorage.removeItem("reset_email");
             localStorage.removeItem("reset_token");
-
+            toast.success("Password reset successful. Please log in.");
             navigate("/login");
         },
 
-        onError: (error: any) => {
-            const data = error.response?.data;
+        onError: (error: unknown) => {
+            const appError = normalizeApiError(error);
+            const fieldError =
+                getFieldError(appError.fieldErrors, "new_password") ??
+                getFieldError(appError.fieldErrors, "confirm_password") ??
+                getFieldError(appError.fieldErrors, "reset_token") ??
+                appError.message;
 
-            if (data?.new_password) {
-                setError(data.new_password[0]);
-            } else if (data?.confirm_password) {
-                setError(data.confirm_password[0]);
-            } else if (data?.reset_token) {
-                setError(data.reset_token[0]);
-            } else if (data?.detail) {
-                setError(data.detail);
-            } else {
-                setError("Something went wrong. Please try again.");
-            }
+            setError(fieldError);
+            toast.error(appError.message);
         },
     });
 

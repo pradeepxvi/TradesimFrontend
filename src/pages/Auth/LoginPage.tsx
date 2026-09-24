@@ -8,8 +8,10 @@ import { LoginUser } from "../../api/auth";
 
 import { useNavigate } from "react-router-dom";
 
-import axios from "axios";
+import { toast } from "react-toastify";
 import LoginForm from "../../components/Auth/LoginForm";
+import { normalizeApiError, getFirstFormError } from "../../utils/error";
+import { saveStoredUser } from "../../utils/session";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -27,27 +29,21 @@ const LoginPage = () => {
         onSuccess: (data: LoginResponse) => {
             setErrors({});
 
-            localStorage.setItem("user", JSON.stringify(data));
-
+            saveStoredUser(data);
+            toast.success("Login successful.");
             navigate("/dashboard");
         },
 
         onError: (error: unknown) => {
-            if (axios.isAxiosError(error)) {
-                const data = error.response?.data;
+            const appError = normalizeApiError(error);
+            const formError = getFirstFormError(appError.fieldErrors);
 
-                console.log("Login error:", error.response);
-
-                setErrors(
-                    data ?? {
-                        form: ["Something went wrong."],
-                    },
-                );
-            } else {
-                setErrors({
-                    form: ["Something went wrong."],
-                });
-            }
+            setErrors(
+                appError.fieldErrors ?? {
+                    form: [formError ?? appError.message],
+                },
+            );
+            toast.error(appError.message);
         },
     });
 

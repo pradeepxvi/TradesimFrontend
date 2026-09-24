@@ -6,6 +6,7 @@ import {
     Bookmark,
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import {
     AddWatchlist,
     CompanyCandles,
@@ -63,8 +64,19 @@ const StockDetailPanel = ({
                 await AddWatchlist(stock?.symbol ?? "");
             }
         },
-        onSuccess: () =>
-            queryClient.invalidateQueries({ queryKey: ["watchlist"] }),
+        onSuccess: (_, watched) => {
+            queryClient.invalidateQueries({ queryKey: ["watchlist"] });
+            toast.success(
+                watched ? "Removed from watchlist." : "Added to watchlist.",
+            );
+        },
+        onError: (_, watched) => {
+            toast.error(
+                watched
+                    ? "Could not remove this stock from the watchlist."
+                    : "Could not add this stock to the watchlist.",
+            );
+        },
     });
 
     if (isLoading) {
@@ -391,7 +403,17 @@ const OrderPanel = ({
         queryFn: Wallet,
         staleTime: 30_000,
     });
-    const orderMutation = useMutation({ mutationFn: CreateOrder });
+    const orderMutation = useMutation({
+        mutationFn: CreateOrder,
+        onSuccess: (createdOrder) => {
+            toast.success(
+                `${createdOrder.side} order for ${createdOrder.symbol} was ${createdOrder.status.toLowerCase()}.`,
+            );
+        },
+        onError: () => {
+            toast.error("Order could not be placed. Please try again.");
+        },
+    });
     const total = quantity * Number(price ?? 0);
 
     return (
@@ -410,21 +432,6 @@ const OrderPanel = ({
                     SELL
                 </button>
             </div>
-            <p className="mt-4 text-xs text-slate-500">Order type</p>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-                <button
-                    disabled
-                    className="rounded-md bg-slate-800 px-3 py-2 text-xs text-slate-600"
-                >
-                    MARKET
-                </button>
-                <button
-                    disabled
-                    className="rounded-md bg-blue-600 px-3 py-2 text-xs text-white"
-                >
-                    LIMIT
-                </button>
-            </div>
             <label
                 className="mt-4 block text-xs text-slate-500"
                 htmlFor="order-quantity"
@@ -441,19 +448,6 @@ const OrderPanel = ({
                 }
                 placeholder="0"
                 className="mt-2 h-9 w-full rounded-md border border-slate-800 bg-[#1b222c] px-3 text-sm text-slate-600"
-            />
-            <label
-                className="mt-4 block text-xs text-slate-500"
-                htmlFor="limit-price"
-            >
-                Limit price (Rs)
-            </label>
-            <input
-                id="limit-price"
-                disabled
-                value={price ?? "Unavailable"}
-                readOnly
-                className="mt-2 h-9 w-full rounded-md border border-slate-800 bg-[#1b222c] px-3 font-mono text-sm text-slate-300"
             />
             <div className="mt-5 flex justify-between text-xs text-slate-500">
                 <span>Est. total</span>

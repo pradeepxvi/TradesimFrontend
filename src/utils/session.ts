@@ -12,3 +12,11 @@ export const getStoredUser = (): LoginResponse | null => {
         return null;
     }
 };
+
+export const saveStoredUser = (user: LoginResponse) => {
+    localStorage.setItem("user", JSON.stringify(user));
+};
+
+export const clearStoredUser = () => {
+    localStorage.removeItem("user");
+};

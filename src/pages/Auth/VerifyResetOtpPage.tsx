@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { verifyResetOtp } from "../../api/auth";
 import type { VerifyResetOtpData } from "../../types/auth";
+import { getFieldError, normalizeApiError } from "../../utils/error";
 
 function VerifyResetOtp() {
     const navigate = useNavigate();
@@ -17,19 +19,16 @@ function VerifyResetOtp() {
 
         onSuccess: (data) => {
             localStorage.setItem("reset_token", data.reset_token);
+            toast.success("OTP verified. You can reset your password now.");
             navigate("/password-reset");
         },
 
-        onError: (error: any) => {
-            const data = error.response?.data;
-
-            if (data?.otp) {
-                setError(data.otp[0]);
-            } else if (data?.detail) {
-                setError(data.detail);
-            } else {
-                setError("Invalid OTP. Please try again.");
-            }
+        onError: (error: unknown) => {
+            const appError = normalizeApiError(error);
+            const fieldError =
+                getFieldError(appError.fieldErrors, "otp") ?? appError.message;
+            setError(fieldError);
+            toast.error(appError.message);
         },
     });
 

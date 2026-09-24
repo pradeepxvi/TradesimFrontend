@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import {
     AddWatchlist,
     Companies,
@@ -50,6 +51,10 @@ const Watchlistpage = () => {
             setIsAddOpen(false);
             setSymbolToAdd("");
             setMessage("Stock added to your watchlist.");
+            toast.success("Stock added to your watchlist.");
+        },
+        onError: () => {
+            toast.error("Could not add that stock to the watchlist.");
         },
     });
     const removeMutation = useMutation({
@@ -57,6 +62,10 @@ const Watchlistpage = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["watchlist"] });
             setMessage("Stock removed from your watchlist.");
+            toast.success("Stock removed from your watchlist.");
+        },
+        onError: () => {
+            toast.error("Could not remove that stock from the watchlist.");
         },
     });
     const orderMutation = useMutation({
@@ -67,6 +76,12 @@ const Watchlistpage = () => {
             setMessage(
                 `${createdOrder.side} order for ${createdOrder.symbol} was ${createdOrder.status.toLowerCase()}.`,
             );
+            toast.success(
+                `${createdOrder.side} order for ${createdOrder.symbol} was ${createdOrder.status.toLowerCase()}.`,
+            );
+        },
+        onError: () => {
+            toast.error("Order could not be placed. Please try again.");
         },
     });
 
@@ -90,27 +105,29 @@ const Watchlistpage = () => {
     };
 
     return (
-        <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-5 lg:p-6">
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-blue-400">
-                        Saved market view
-                    </p>
-                    <h1 className="mt-1 text-2xl font-semibold text-white">
-                        Watchlist
-                    </h1>
+        <div className="mobile-stack">
+            <header className="surface-card rounded-2xl p-4 sm:p-5">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400">
+                            Saved market view
+                        </p>
+                        <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
+                            Watchlist
+                        </h1>
+                    </div>
+                    <button
+                        onClick={() => setIsAddOpen(true)}
+                        className="flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-medium text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500"
+                    >
+                        <Plus size={14} />
+                        Add Stock
+                    </button>
                 </div>
-                <button
-                    onClick={() => setIsAddOpen(true)}
-                    className="flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-500"
-                >
-                    <Plus size={14} />
-                    Add Stock
-                </button>
-            </div>
+            </header>
 
             {message && (
-                <div className="flex items-center justify-between rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-400">
+                <div className="flex items-center justify-between rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-400">
                     <span className="flex items-center gap-2">
                         <Check size={14} />
                         {message}
@@ -124,9 +141,9 @@ const Watchlistpage = () => {
                 </div>
             )}
 
-            <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#151a21]">
+            <section className="overflow-hidden rounded-2xl border border-slate-800 bg-[#151a21] shadow-2xl shadow-slate-950/20">
                 {isLoading ? (
-                    <div className="m-4 h-56 animate-pulse rounded-md bg-slate-800/70" />
+                    <div className="m-4 h-56 animate-pulse rounded-xl bg-slate-800/70" />
                 ) : watchlistQuery.isError ? (
                     <p className="p-5 text-sm text-slate-500">
                         Watchlist information is unavailable right now.

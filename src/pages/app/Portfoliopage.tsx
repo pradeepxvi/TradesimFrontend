@@ -2,14 +2,15 @@ import { Check, BriefcaseBusiness, LoaderCircle, Plus, X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { CreateOrder, Portfolio, Wallet } from "../../api/market";
 import type { PortfolioHolding } from "../../types/market";
+import { sumNumericValues, toFiniteNumber } from "../../utils/finance";
 
 type OrderSide = "BUY" | "SELL";
 
 const Portfoliopage = () => {
     const queryClient = useQueryClient();
-    const [range, setRange] = useState("1M");
     const [order, setOrder] = useState<{
         symbol: string;
         side: OrderSide;
@@ -38,27 +39,35 @@ const Portfoliopage = () => {
             setMessage(
                 `${createdOrder.side} order for ${createdOrder.symbol} was ${createdOrder.status.toLowerCase()}.`,
             );
+            toast.success(
+                `${createdOrder.side} order for ${createdOrder.symbol} was ${createdOrder.status.toLowerCase()}.`,
+            );
+        },
+        onError: () => {
+            toast.error("Order could not be placed. Please try again.");
         },
     });
 
     const holdings = portfolioQuery.data ?? [];
-    const portfolioValue = holdings.reduce(
-        (total, holding) => total + Number(holding.market_value || 0),
-        0,
+    const portfolioValue = sumNumericValues(
+        holdings.map((holding) => holding.market_value),
     );
-    const investedAmount = holdings.reduce(
-        (total, holding) =>
-            total + Number(holding.average_buy_price || 0) * holding.quantity,
-        0,
+    const investedAmount = sumNumericValues(
+        holdings.map((holding) => {
+            const averagePrice = toFiniteNumber(holding.average_buy_price);
+            return averagePrice === null
+                ? null
+                : averagePrice * holding.quantity;
+        }),
     );
-    const availableCash = Number(walletQuery.data?.virtual_balance ?? 0);
-    const totalProfitLoss = holdings.reduce(
-        (total, holding) => total + Number(holding.unrealized_profit_loss || 0),
-        0,
+    const availableCash = toFiniteNumber(walletQuery.data?.virtual_balance);
+    const totalProfitLoss = sumNumericValues(
+        holdings.map((holding) => holding.unrealized_profit_loss),
     );
-    const totalProfitPercent = investedAmount
-        ? (totalProfitLoss / investedAmount) * 100
-        : 0;
+    const totalProfitPercent =
+        investedAmount && totalProfitLoss !== null
+            ? (totalProfitLoss / investedAmount) * 100
+            : null;
     const isLoading = portfolioQuery.isLoading || walletQuery.isLoading;
     const hasError = portfolioQuery.isError || walletQuery.isError;
 
@@ -107,12 +116,29 @@ const Portfoliopage = () => {
             {isLoading ? (
                 <div className="h-40 animate-pulse rounded-lg border border-slate-800 bg-[#151a21]" />
             ) : hasError ? (
-                <p className="rounded-lg border border-slate-800 bg-[#151a21] p-5 text-sm text-slate-500">
-                    Portfolio information is unavailable right now.
-                </p>
+                <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-5 text-sm text-slate-300">
+                    <p className="font-medium text-amber-300">
+                        Unable to load your portfolio
+                    </p>
+                    <p className="mt-1 text-slate-400">
+                        Please try again in a moment.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            void Promise.all([
+                                portfolioQuery.refetch(),
+                                walletQuery.refetch(),
+                            ]);
+                        }}
+                        className="mt-3 rounded-xl bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-200 hover:bg-amber-500/20"
+                    >
+                        Retry
+                    </button>
+                </div>
             ) : (
                 <>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         <MetricCard
                             label="Portfolio Value"
                             value={formatAmount(portfolioValue)}
@@ -126,24 +152,23 @@ const Portfoliopage = () => {
                             value={formatAmount(availableCash)}
                         />
                         <MetricCard
-                            label="Total P/L"
-                            value={`${totalProfitLoss >= 0 ? "+" : "-"}${formatAmount(Math.abs(totalProfitLoss))}`}
-                            detail={`${totalProfitPercent >= 0 ? "+" : ""}${totalProfitPercent.toFixed(2)}%`}
+                            label="Unrealized P/L"
+                            value={formatSignedAmount(totalProfitLoss)}
+                            detail={
+                                totalProfitPercent === null
+                                    ? "N/A"
+                                    : `${totalProfitPercent >= 0 ? "+" : ""}${totalProfitPercent.toFixed(2)}%`
+                            }
                             tone={
-                                totalProfitLoss >= 0 ? "positive" : "negative"
+                                totalProfitLoss === null
+                                    ? "neutral"
+                                    : totalProfitLoss >= 0
+                                      ? "positive"
+                                      : "negative"
                             }
                         />
-                        <MetricCard
-                            label="Today's P/L"
-                            value="-"
-                            detail="History unavailable"
-                        />
                     </div>
-                    <PortfolioChart
-                        holdings={holdings}
-                        range={range}
-                        onRangeChange={setRange}
-                    />
+                    <PortfolioChart holdings={holdings} />
                     <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#151a21]">
                         <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-3">
                             <BriefcaseBusiness
@@ -228,19 +253,15 @@ const MetricCard = ({
     </div>
 );
 
-const PortfolioChart = ({
-    holdings,
-    range,
-    onRangeChange,
-}: {
-    holdings: PortfolioHolding[];
-    range: string;
-    onRangeChange: (value: string) => void;
-}) => {
+const PortfolioChart = ({ holdings }: { holdings: PortfolioHolding[] }) => {
     const width = 800;
     const chartTop = 18;
     const chartBottom = 190;
-    const values = holdings.map((holding) => Number(holding.market_value || 0));
+    const chartHoldings = holdings.flatMap((holding) => {
+        const value = toFiniteNumber(holding.market_value);
+        return value === null ? [] : [{ holding, value }];
+    });
+    const values = chartHoldings.map(({ value }) => value);
     const maximum = Math.max(...values, 1);
     const minimum = Math.min(...values, 0);
     const valueRange = maximum - minimum || 1;
@@ -267,17 +288,6 @@ const PortfolioChart = ({
                     <p className="mt-1 text-[11px] text-slate-600">
                         Current value by holding
                     </p>
-                </div>
-                <div className="flex gap-1 text-[10px] text-slate-500">
-                    {["1W", "1M", "3M", "6M", "1Y"].map((item) => (
-                        <button
-                            key={item}
-                            onClick={() => onRangeChange(item)}
-                            className={`rounded px-2 py-1 ${range === item ? "bg-blue-600 text-white" : "hover:bg-slate-800 hover:text-slate-300"}`}
-                        >
-                            {item}
-                        </button>
-                    ))}
                 </div>
             </div>
             {points.length === 0 ? (
@@ -313,7 +323,7 @@ const PortfolioChart = ({
                             strokeLinecap="round"
                         />
                         {points.map((point, index) => (
-                            <g key={holdings[index].symbol}>
+                            <g key={chartHoldings[index].holding.symbol}>
                                 <circle
                                     cx={point.x}
                                     cy={point.y}
@@ -329,7 +339,7 @@ const PortfolioChart = ({
                                     fill="#64748b"
                                     fontSize="10"
                                 >
-                                    {holdings[index].symbol}
+                                    {chartHoldings[index].holding.symbol}
                                 </text>
                             </g>
                         ))}
@@ -373,15 +383,21 @@ const HoldingsTable = ({
             </thead>
             <tbody className="divide-y divide-slate-800">
                 {holdings.map((holding) => {
-                    const invested =
-                        Number(holding.average_buy_price) * holding.quantity;
-                    const profitLoss = Number(
-                        holding.unrealized_profit_loss || 0,
+                    const investedPrice = toFiniteNumber(
+                        holding.average_buy_price,
                     );
-                    const percent = invested
-                        ? (profitLoss / invested) * 100
-                        : 0;
-                    const positive = profitLoss >= 0;
+                    const invested =
+                        investedPrice === null
+                            ? null
+                            : investedPrice * holding.quantity;
+                    const profitLoss = toFiniteNumber(
+                        holding.unrealized_profit_loss,
+                    );
+                    const percent =
+                        invested && profitLoss !== null
+                            ? (profitLoss / invested) * 100
+                            : null;
+                    const positive = profitLoss !== null && profitLoss >= 0;
                     return (
                         <tr
                             key={holding.symbol}
@@ -413,19 +429,23 @@ const HoldingsTable = ({
                                 {formatAmount(invested)}
                             </td>
                             <td className="px-4 py-3 font-mono text-slate-200">
-                                {formatAmount(Number(holding.market_value))}
+                                {formatAmount(
+                                    toFiniteNumber(holding.market_value),
+                                )}
                             </td>
                             <td
                                 className={`px-4 py-3 font-mono ${positive ? "text-emerald-400" : "text-red-400"}`}
                             >
-                                {positive ? "+" : "-"}
-                                {formatAmount(Math.abs(profitLoss))}
+                                {profitLoss === null
+                                    ? "N/A"
+                                    : `${positive ? "+" : "-"}${formatAmount(Math.abs(profitLoss))}`}
                             </td>
                             <td
                                 className={`px-4 py-3 font-mono ${positive ? "text-emerald-400" : "text-red-400"}`}
                             >
-                                {positive ? "+" : ""}
-                                {percent.toFixed(2)}%
+                                {percent === null
+                                    ? "N/A"
+                                    : `${positive ? "+" : ""}${percent.toFixed(2)}%`}
                             </td>
                             <td className="px-4 py-3">
                                 <div className="flex gap-1.5">
@@ -552,7 +572,14 @@ const OrderDialog = ({
     </div>
 );
 
-const formatAmount = (value: number) =>
-    `Rs ${value.toLocaleString("en-NP", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `Rs ${value.toLocaleString("en-NP", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const formatSignedAmount = (value: number | null) =>
+    value === null
+        ? "N/A"
+        : `${value >= 0 ? "+" : "-"}${formatAmount(Math.abs(value))}`;
 
 export default Portfoliopage;

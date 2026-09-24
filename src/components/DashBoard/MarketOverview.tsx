@@ -1,4 +1,10 @@
-import { Activity, ArrowDownRight, ArrowUpRight } from "lucide-react";
+import {
+    Activity,
+    ArrowDownRight,
+    ArrowUpRight,
+    Banknote,
+    Clock3,
+} from "lucide-react";
 import useMarket from "../../context/useMarket";
 
 const MarketOverview = ({
@@ -15,30 +21,45 @@ const MarketOverview = ({
     if (error || !market_overview) {
         return (
             <Section title={title}>
-                <Message text="Market information is unavailable right now." />
+                <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-slate-300">
+                    <p className="font-medium text-amber-300">
+                        Unable to load market data
+                    </p>
+                    <p className="mt-1 text-slate-400">
+                        We couldn't reach the market feed right now.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => window.location.reload()}
+                        className="mt-3 rounded-xl bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-200 hover:bg-amber-500/20"
+                    >
+                        Retry market data
+                    </button>
+                </div>
             </Section>
         );
     }
 
-    const nepse = market_overview.indices.find(
+    const nepse = market_overview.indices?.find(
         (index) => index.symbol.toUpperCase() === "NEPSE",
     );
     const change = Number(nepse?.change ?? 0);
     const changePercent = nepse?.change_percent;
     const positive = change >= 0;
     const summary = market_overview.market_summary;
+    const updatedAt = formatUpdatedTime(market_overview.market_status?.time);
 
     return (
         <Section title={title}>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-lg border border-blue-500/20 bg-blue-500/10 p-4 sm:col-span-2 lg:col-span-1">
+            <div className="grid gap-3 md:grid-cols-[1.35fr_1fr_1fr]">
+                <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4">
                     <div className="flex items-center justify-between gap-2">
                         <span className="text-xs text-slate-400">
                             NEPSE index
                         </span>
                         <span className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                            {market_overview.market_status.status}
+                            {market_overview.market_status?.status ?? "N/A"}
                         </span>
                     </div>
                     <p className="mt-2 font-mono text-2xl font-semibold text-white">
@@ -59,21 +80,44 @@ const MarketOverview = ({
                             : ""}
                     </p>
                 </div>
-                <Metric
-                    label="Advances"
-                    value={summary.advances}
-                    tone="positive"
+                <MarketStat
+                    label="Total turnover"
+                    value={formatTurnover(summary?.total_turnover)}
+                    icon={<Banknote size={16} />}
+                    accent="text-amber-300"
                 />
-                <Metric
-                    label="Declines"
-                    value={summary.declines}
-                    tone="negative"
+                <MarketStat
+                    label="Last updated"
+                    value={updatedAt}
+                    icon={<Clock3 size={16} />}
+                    accent="text-cyan-300"
                 />
-                <Metric label="Unchanged" value={summary.unchanged} />
             </div>
         </Section>
     );
 };
+
+const MarketStat = ({
+    label,
+    value,
+    icon,
+    accent,
+}: {
+    label: string;
+    value: string;
+    icon: React.ReactNode;
+    accent: string;
+}) => (
+    <div className="rounded-2xl border border-slate-800 bg-[#1b222c] p-4">
+        <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-400">{label}</p>
+            <span className={accent}>{icon}</span>
+        </div>
+        <p className="mt-4 truncate font-mono text-lg font-semibold text-slate-100">
+            {value}
+        </p>
+    </div>
+);
 
 const Section = ({
     title,
@@ -99,29 +143,28 @@ const Section = ({
     </section>
 );
 
-const Metric = ({
-    label,
-    value,
-    tone = "neutral",
-}: {
-    label: string;
-    value: number | null;
-    tone?: "positive" | "negative" | "neutral";
-}) => (
-    <div className="rounded-lg border border-slate-800 bg-[#1b222c] p-4">
-        <p
-            className={`text-xs font-medium ${tone === "positive" ? "text-emerald-400" : tone === "negative" ? "text-red-400" : "text-slate-400"}`}
-        >
-            {label}
-        </p>
-        <p className="mt-2 font-mono text-xl font-semibold text-slate-100">
-            {value ?? "-"}
-        </p>
-    </div>
-);
+const formatTurnover = (value: string | null | undefined) => {
+    if (value === null || value === undefined || value === "") return "N/A";
 
-const Message = ({ text }: { text: string }) => (
-    <p className="text-sm text-slate-500">{text}</p>
-);
+    const amount = Number(value);
+    return Number.isFinite(amount)
+        ? `Rs ${amount.toLocaleString("en-NP", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+          })}`
+        : "N/A";
+};
+
+const formatUpdatedTime = (value: string | null | undefined) => {
+    if (!value) return "N/A";
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+        ? value
+        : date.toLocaleTimeString("en-NP", {
+              hour: "2-digit",
+              minute: "2-digit",
+          });
+};
 
 export default MarketOverview;

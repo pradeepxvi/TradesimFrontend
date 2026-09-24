@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { requestPasswordReset } from "../../api/auth";
 import type { PasswordResetRequestData } from "../../types/auth";
+import { getFieldError, normalizeApiError } from "../../utils/error";
 
 function PasswordResetRequestPage() {
     const navigate = useNavigate();
@@ -15,19 +17,15 @@ function PasswordResetRequestPage() {
 
         onSuccess: () => {
             localStorage.setItem("reset_email", email);
+            toast.success("OTP sent to your email.");
             navigate("/password-reset/verify-otp");
         },
 
-        onError: (error: any) => {
-            const data = error.response?.data;
-
-            if (data?.email) {
-                setError(data.email[0]);
-            } else if (data?.detail) {
-                setError(data.detail);
-            } else {
-                setError("Something went wrong. Please try again.");
-            }
+        onError: (error: unknown) => {
+            const appError = normalizeApiError(error);
+            const fieldError = getFieldError(appError.fieldErrors, "email");
+            setError(fieldError ?? appError.message);
+            toast.error(appError.message);
         },
     });
 

@@ -81,99 +81,106 @@ const Stockspage = () => {
     }
 
     return (
-        <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-5 lg:p-6">
-            <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-blue-400">
+        <div className="mobile-stack">
+            <header className="surface-card rounded-2xl p-4 sm:p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400">
                     Market directory
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold text-white">
+                <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">
                     Stocks
                 </h1>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-2 text-sm text-slate-400">
                     Browse available market data and open a stock for its
                     details.
                 </p>
-            </div>
+            </header>
 
-            <div className="relative max-w-md">
-                <Search
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-                />
-                <input
-                    aria-label="Search stocks"
-                    placeholder="Search by symbol or company"
-                    className="h-10 w-full rounded-lg border border-slate-800 bg-[#151a21] pl-9 pr-3 text-sm text-slate-200 outline-none placeholder:text-slate-600 focus:border-blue-500/50"
-                    value={searchTerm}
-                    onChange={(event) => {
-                        setSearchTerm(event.target.value);
-                        setCurrentPage(1);
-                    }}
-                    onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                            const value = event.currentTarget.value.trim();
-                            if (value) {
-                                navigate(
-                                    `/stocks/${encodeURIComponent(value.toUpperCase())}`,
-                                );
-                            }
-                        }
-                    }}
-                />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-                {sectors.map((sector) => (
-                    <button
-                        key={sector}
-                        onClick={() => {
-                            setSelectedSector(sector);
+            <div className="surface-card rounded-2xl p-3 sm:p-4">
+                <div className="relative max-w-md">
+                    <Search
+                        size={16}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                    />
+                    <input
+                        aria-label="Search stocks"
+                        placeholder="Search by symbol or company"
+                        className="h-11 w-full rounded-xl border border-slate-800 bg-[#1b222c] pl-9 pr-3 text-sm text-slate-200 outline-none placeholder:text-slate-600 focus:border-blue-500/50"
+                        value={searchTerm}
+                        onChange={(event) => {
+                            setSearchTerm(event.target.value);
                             setCurrentPage(1);
                         }}
-                        className={`rounded-md px-3 py-1.5 text-xs ${selectedSector === sector ? "bg-blue-600 text-white" : "border border-slate-800 bg-[#151a21] text-slate-400 hover:text-slate-200"}`}
-                    >
-                        {sector}
-                    </button>
-                ))}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                                const value = event.currentTarget.value.trim();
+                                if (value) {
+                                    navigate(
+                                        `/stocks/${encodeURIComponent(value.toUpperCase())}`,
+                                    );
+                                }
+                            }
+                        }}
+                    />
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                    {sectors.map((sector) => (
+                        <button
+                            key={sector}
+                            onClick={() => {
+                                setSelectedSector(sector);
+                                setCurrentPage(1);
+                            }}
+                            className={`rounded-full px-3 py-1.5 text-xs ${selectedSector === sector ? "bg-blue-600 text-white shadow-md shadow-blue-500/20" : "border border-slate-800 bg-[#151a21] text-slate-400 hover:text-slate-200"}`}
+                        >
+                            {sector}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {companiesQuery.isLoading ? (
-                <div className="h-64 animate-pulse rounded-lg border border-slate-800 bg-[#151a21]" />
+                <div className="h-64 animate-pulse rounded-2xl border border-slate-800 bg-[#151a21]" />
             ) : companiesQuery.error ? (
                 <Message text="Stock data is unavailable right now." />
             ) : stocks.length === 0 ? (
                 <Message text="No stock data is available from the market API." />
             ) : (
-                <div className="overflow-x-auto rounded-lg border border-slate-800 bg-[#151a21]">
-                    <table className="w-full min-w-[720px] text-left text-xs">
-                        <thead className="border-b border-slate-800 text-slate-500">
-                            <tr>
-                                <th className="px-4 py-3 font-medium">
-                                    Symbol
-                                </th>
-                                <th className="px-4 py-3 font-medium">
-                                    Company
-                                </th>
-                                <th className="px-4 py-3 font-medium">
-                                    Sector
-                                </th>
-                                <th className="px-4 py-3 text-right font-medium">
-                                    LTP
-                                </th>
-                                <th className="px-4 py-3 text-right font-medium">
-                                    Change
-                                </th>
-                                <th className="px-4 py-3 text-right font-medium">
-                                    Change %
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800">
-                            {visibleStocks.map((stock) => (
-                                <StockRow key={stock.symbol} stock={stock} />
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="overflow-hidden rounded-2xl border border-slate-800 bg-[#151a21] shadow-2xl shadow-slate-950/20">
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[720px] text-left text-xs">
+                            <thead className="border-b border-slate-800 bg-[#1a212b] text-slate-500">
+                                <tr>
+                                    <th className="px-4 py-3 font-medium">
+                                        Symbol
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Company
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        Sector
+                                    </th>
+                                    <th className="px-4 py-3 text-right font-medium">
+                                        LTP
+                                    </th>
+                                    <th className="px-4 py-3 text-right font-medium">
+                                        Change
+                                    </th>
+                                    <th className="px-4 py-3 text-right font-medium">
+                                        Change %
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-800">
+                                {visibleStocks.map((stock) => (
+                                    <StockRow
+                                        key={stock.symbol}
+                                        stock={stock}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                     <div className="flex items-center justify-between border-t border-slate-800 px-4 py-3 text-xs text-slate-500">
                         <span>
                             Showing{" "}
