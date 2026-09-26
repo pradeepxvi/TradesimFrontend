@@ -12,7 +12,6 @@ import type { ChangePasswordData } from "../../types/auth";
 import { getStoredUser } from "../../utils/session";
 import { sumNumericValues } from "../../utils/finance";
 import { toast } from "react-toastify";
-import axios from "axios";
 
 const Profilepage = () => {
     const session = getStoredUser() ?? undefined;
