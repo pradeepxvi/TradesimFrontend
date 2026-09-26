@@ -1,7 +1,7 @@
 import { Menu, Moon, Search, Sun } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getStoredUser } from "../../utils/session";
 import useMarket from "../../context/useMarket";
 import { Companies } from "../../api/market";
@@ -201,9 +201,12 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
                     </div>
 
                     {user ? (
-                        <button className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]">
+                        <Link
+                            to="/profile"
+                            className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]"
+                        >
                             {user.user?.full_name.charAt(0).toUpperCase()}
-                        </button>
+                        </Link>
                     ) : (
                         <button
                             onClick={() => navigate("/login")}
