@@ -17,6 +17,7 @@ import {
     Watchlist,
 } from "../../api/market";
 import type { Company, WatchlistItem } from "../../types/market";
+import { Link } from "react-router-dom";
 
 type OrderSide = "BUY" | "SELL";
 type WatchlistRowData = Company & {
@@ -279,7 +280,11 @@ const WatchlistTable = ({
                     return (
                         <tr key={item.id} className="hover:bg-slate-800/40">
                             <td className="px-4 py-3 font-mono font-semibold text-blue-400">
-                                {item.symbol}
+                                <Link
+                                    to={`/stocks/${encodeURIComponent(item.symbol)}`}
+                                >
+                                    {item.symbol}
+                                </Link>
                             </td>
                             <td className="max-w-56 truncate px-4 py-3 text-slate-300">
                                 {stock.name ?? item.symbol}

@@ -44,7 +44,12 @@ const AuthLayout = () => {
                 </div>
 
                 <div className="mt-24 xl:mt-28 2xl:mt-36">
-                    <h2 className="max-w-md text-2xl font-bold leading-tight text-white xl:text-[27px]">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300">
+                        <span className="h-2 w-2 rounded-full bg-blue-400" />
+                        Live practice
+                    </div>
+
+                    <h2 className="mt-6 max-w-md text-2xl font-bold leading-tight text-white xl:text-[27px]">
                         Practice trading
                         <br />
                         without the risk.
@@ -56,7 +61,7 @@ const AuthLayout = () => {
                         the learning.
                     </p>
 
-                    <div className="mt-8 space-y-5">
+                    <div className="mt-8 space-y-4">
                         <Feature
                             title="Real NEPSE market data"
                             description="Live prices and market depth"
@@ -81,7 +86,9 @@ const AuthLayout = () => {
 
             <main className="flex min-w-0 flex-1 items-center justify-center bg-[#0d1117]">
                 <div className="w-full max-w-[520px] px-5 py-8 sm:px-8 sm:py-12 lg:px-8 xl:px-10 xl:py-16">
-                    <Outlet />
+                    <div className="rounded-[28px] border border-white/8 bg-[#121a22]/80 p-4 shadow-[0_25px_70px_rgba(15,23,42,0.28)] backdrop-blur-xl sm:p-6 lg:p-7">
+                        <Outlet />
+                    </div>
                 </div>
             </main>
         </div>

@@ -1,8 +1,10 @@
+import { Mail, UserRound } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
 
 import { Link } from "react-router-dom";
 
 import type { RegisterData } from "../../types/auth";
+import PasswordField from "./PasswordField";
 
 type RegisterFormProps = {
     formData: RegisterData;
@@ -25,35 +27,37 @@ const RegisterForm = ({
 }: RegisterFormProps) => {
     return (
         <div className="w-full">
-            {/* Heading */}
             <div className="mb-7 sm:mb-8">
-                <h1 className="text-xl sm:text-[22px] font-bold text-gray-100">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-300">
+                    <UserRound size={12} />
+                    New account
+                </div>
+
+                <h1 className="text-2xl font-bold text-white sm:text-[28px]">
                     Create an account
                 </h1>
 
-                <p className="mt-1 text-sm sm:text-base text-[#657892]">
-                    Create your TradeSim account
+                <p className="mt-2 text-sm text-[#657892] sm:text-base">
+                    Create your TradeSim account and start practicing.
                 </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Non field errors */}
                 {errors.non_field_errors?.map((error, index) => (
                     <p
                         key={index}
-                        className="mt-1.5 text-sm text-red-400 break-words"
+                        className="mt-1.5 break-words text-sm text-red-400"
                     >
                         {error}
                     </p>
                 ))}
 
-                {/* General Error */}
                 {errors.form?.length > 0 && (
-                    <div className="w-full rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
+                    <div className="w-full rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3">
                         {errors.form.map((error, index) => (
                             <p
                                 key={index}
-                                className="text-sm text-red-400 break-words"
+                                className="break-words text-sm text-red-400"
                             >
                                 {error}
                             </p>
@@ -61,228 +65,111 @@ const RegisterForm = ({
                     </div>
                 )}
 
-                {/* Full Name */}
                 <div className="w-full">
                     <label
                         htmlFor="full_name"
-                        className="block text-sm sm:text-[15px] font-medium text-gray-200 mb-2"
+                        className="mb-2 block text-sm font-medium text-slate-200 sm:text-[15px]"
                     >
                         Full name
                     </label>
 
-                    <input
-                        id="full_name"
-                        name="full_name"
-                        type="text"
-                        value={formData.full_name}
-                        onChange={handleChange}
-                        placeholder="Pradeep Kunwar"
-                        autoComplete="name"
-                        className="
-                            block
-                            w-full
-                            h-11
-                            rounded-md
-                            border
-                            border-[#272e37]
-                            bg-[#171c23]
-                            px-3.5
-                            text-sm
-                            sm:text-[15px]
-                            text-gray-100
-                            placeholder-[#62728a]
-                            outline-none
-                            transition
-                            focus:border-blue-500
-                            focus:ring-1
-                            focus:ring-blue-500
-                        "
-                    />
+                    <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <UserRound size={16} />
+                        </span>
+                        <input
+                            id="full_name"
+                            name="full_name"
+                            type="text"
+                            value={formData.full_name}
+                            onChange={handleChange}
+                            placeholder="Pradeep Kunwar"
+                            autoComplete="name"
+                            className="block h-12 w-full rounded-2xl border border-[#272e37] bg-[#171c23] pl-11 pr-3.5 text-sm text-slate-100 placeholder:text-[#62728a] outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                    </div>
 
                     {errors.full_name?.map((error, index) => (
                         <p
                             key={index}
-                            className="mt-1.5 text-sm text-red-400 break-words"
+                            className="mt-1.5 break-words text-sm text-red-400"
                         >
                             {error}
                         </p>
                     ))}
                 </div>
 
-                {/* Email */}
                 <div className="w-full">
                     <label
                         htmlFor="email"
-                        className="block text-sm sm:text-[15px] font-medium text-gray-200 mb-2"
+                        className="mb-2 block text-sm font-medium text-slate-200 sm:text-[15px]"
                     >
                         Email address
                     </label>
 
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="pradeep@gmail.com"
-                        autoComplete="email"
-                        className="
-                            block
-                            w-full
-                            h-11
-                            rounded-md
-                            border
-                            border-[#272e37]
-                            bg-[#171c23]
-                            px-3.5
-                            text-sm
-                            sm:text-[15px]
-                            text-gray-100
-                            placeholder-[#62728a]
-                            outline-none
-                            transition
-                            focus:border-blue-500
-                            focus:ring-1
-                            focus:ring-blue-500
-                        "
-                    />
+                    <div className="relative">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <Mail size={16} />
+                        </span>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="pradeep@gmail.com"
+                            autoComplete="email"
+                            className="block h-12 w-full rounded-2xl border border-[#272e37] bg-[#171c23] pl-11 pr-3.5 text-sm text-slate-100 placeholder:text-[#62728a] outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        />
+                    </div>
 
                     {errors.email?.map((error, index) => (
                         <p
                             key={index}
-                            className="mt-1.5 text-sm text-red-400 break-words"
+                            className="mt-1.5 break-words text-sm text-red-400"
                         >
                             {error}
                         </p>
                     ))}
                 </div>
 
-                {/* Password */}
-                <div className="w-full">
-                    <label
-                        htmlFor="password"
-                        className="block text-sm sm:text-[15px] font-medium text-gray-200 mb-2"
-                    >
-                        Password
-                    </label>
+                <PasswordField
+                    id="password"
+                    name="password"
+                    label="Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Create a password"
+                    autoComplete="new-password"
+                    error={errors.password?.[0]}
+                />
 
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Create a password"
-                        autoComplete="new-password"
-                        className="
-                            block
-                            w-full
-                            h-11
-                            rounded-md
-                            border
-                            border-[#272e37]
-                            bg-[#171c23]
-                            px-3.5
-                            text-sm
-                            sm:text-[15px]
-                            text-gray-100
-                            placeholder-[#62728a]
-                            outline-none
-                            transition
-                            focus:border-blue-500
-                            focus:ring-1
-                            focus:ring-blue-500
-                        "
-                    />
+                <PasswordField
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    label="Confirm password"
+                    value={formData.password_confirmation}
+                    onChange={handleChange}
+                    placeholder="Confirm your password"
+                    autoComplete="new-password"
+                    error={errors.password_confirmation?.[0]}
+                />
 
-                    {errors.password?.map((error, index) => (
-                        <p
-                            key={index}
-                            className="mt-1.5 text-sm text-red-400 break-words"
-                        >
-                            {error}
-                        </p>
-                    ))}
-                </div>
-
-                {/* Confirm Password */}
-                <div className="w-full">
-                    <label
-                        htmlFor="password_confirmation"
-                        className="block text-sm sm:text-[15px] font-medium text-gray-200 mb-2"
-                    >
-                        Confirm password
-                    </label>
-
-                    <input
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        type="password"
-                        value={formData.password_confirmation}
-                        onChange={handleChange}
-                        placeholder="Confirm your password"
-                        autoComplete="new-password"
-                        className="
-                            block
-                            w-full
-                            h-11
-                            rounded-md
-                            border
-                            border-[#272e37]
-                            bg-[#171c23]
-                            px-3.5
-                            text-sm
-                            sm:text-[15px]
-                            text-gray-100
-                            placeholder-[#62728a]
-                            outline-none
-                            transition
-                            focus:border-blue-500
-                            focus:ring-1
-                            focus:ring-blue-500
-                        "
-                    />
-
-                    {errors.password_confirmation?.map((error, index) => (
-                        <p
-                            key={index}
-                            className="mt-1.5 text-sm text-red-400 break-words"
-                        >
-                            {error}
-                        </p>
-                    ))}
-                </div>
-
-                {/* Register Button */}
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="
-                        w-full
-                        h-11
-                        rounded-md
-                        bg-blue-600
-                        hover:bg-blue-500
-                        active:bg-blue-700
-                        disabled:bg-blue-600/60
-                        text-white
-                        text-sm
-                        sm:text-[15px]
-                        font-medium
-                        transition
-                    "
+                    className="h-12 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-500 px-4 text-sm font-semibold text-white shadow-[0_18px_32px_rgba(37,99,235,0.28)] transition hover:from-blue-500 hover:to-blue-400 active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {isLoading ? "Creating account..." : "Create account"}
                 </button>
             </form>
 
-            {/* Login */}
-            <div className="text-center mt-6">
-                <p className="text-sm sm:text-[15px] text-[#657892]">
+            <div className="mt-6 text-center">
+                <p className="text-sm text-[#657892] sm:text-[15px]">
                     Already have an account?{" "}
                     <Link
                         to="/login"
-                        className="text-blue-500 hover:text-blue-400 transition"
+                        className="font-medium text-blue-400 transition hover:text-blue-300"
                     >
                         Login
                     </Link>

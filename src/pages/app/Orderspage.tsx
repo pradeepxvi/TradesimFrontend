@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { CancelOrder, CreateOrder, Orders } from "../../api/market";
 import type { Order, OrderCreate } from "../../types/market";
+import { Link } from "react-router-dom";
 
 type OrderFilter = "ALL" | "OPEN" | "COMPLETED" | "CANCELLED" | "REJECTED";
 type OrderSide = "BUY" | "SELL";
@@ -203,10 +204,11 @@ const OrdersTable = ({
                             </td>
                             <td className="px-4 py-3">
                                 <p className="font-mono font-semibold text-blue-400">
-                                    {order.symbol}
-                                </p>
-                                <p className="max-w-32 truncate text-slate-500">
-                                    {order.symbol}
+                                    <Link
+                                        to={`/stocks/${encodeURIComponent(order.symbol)}`}
+                                    >
+                                        {order.symbol}
+                                    </Link>
                                 </p>
                             </td>
                             <td className="px-4 py-3">
