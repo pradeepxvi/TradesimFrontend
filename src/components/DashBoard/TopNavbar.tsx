@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getStoredUser } from "../../utils/session";
 import useMarket from "../../context/useMarket";
 import { Companies } from "../../api/market";
+import { getProfile, type ProfileResponse } from "../../api/profile";
 
 interface TopNavbarProps {
     onMenuClick: () => void;
@@ -53,6 +54,13 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
         setSearchTerm("");
         setSearchOpen(false);
     };
+
+    const myProfile = useQuery<ProfileResponse>({
+        queryKey: ["profile"],
+        queryFn: getProfile,
+    });
+
+    const profile_picture = myProfile.data?.profile_picture;
 
     return (
         <header className="sticky top-0 z-30 h-[76px] border-b border-white/8 bg-[#121a22]/70 backdrop-blur-2xl">
@@ -203,9 +211,18 @@ const TopNavbar = ({ onMenuClick, theme, onThemeChange }: TopNavbarProps) => {
                     {user ? (
                         <Link
                             to="/profile"
-                            className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]"
+                            className="ml-1 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-400 text-sm font-semibold text-white shadow-[0_10px_22px_rgba(59,130,246,0.35)]"
                         >
-                            {user.user?.full_name.charAt(0).toUpperCase()}
+                            {profile_picture ? (
+                                <img
+                                    src={profile_picture}
+                                    alt="Profile"
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                user.user?.full_name?.charAt(0).toUpperCase() ||
+                                "U"
+                            )}
                         </Link>
                     ) : (
                         <button
