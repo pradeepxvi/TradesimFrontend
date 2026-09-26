@@ -1,4 +1,4 @@
-import { Mail, ShieldCheck } from "lucide-react";
+import { Mail, ShieldCheck, TrendingUp } from "lucide-react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { LoginData } from "../../types/auth";
 import { Link } from "react-router-dom";
@@ -6,13 +6,9 @@ import PasswordField from "./PasswordField";
 
 type LoginFormProps = {
     formData: LoginData;
-
     errors: Record<string, string[]>;
-
     isLoading: boolean;
-
     handleChange: (e: ChangeEvent<HTMLInputElement>) => void;
-
     handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
 };
 
@@ -34,6 +30,7 @@ const LoginForm = ({
                 <h1 className="text-2xl font-bold text-white sm:text-[28px]">
                     Welcome back
                 </h1>
+
                 <p className="mt-2 text-sm text-[#657892]">
                     Sign in to continue trading with your virtual portfolio.
                 </p>
@@ -74,6 +71,7 @@ const LoginForm = ({
                         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
                             <Mail size={16} />
                         </span>
+
                         <input
                             id="email"
                             name="email"
@@ -116,6 +114,7 @@ const LoginForm = ({
                             Forgot password?
                         </Link>
                     </div>
+
                     <div className="flex justify-end">
                         <Link
                             to="/verify-otp"
@@ -133,6 +132,15 @@ const LoginForm = ({
                 >
                     {isLoading ? "Signing in..." : "Login"}
                 </button>
+
+                {/* Market navigation */}
+                <Link
+                    to="/market"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-[#272e37] bg-[#171c23] text-sm font-semibold text-slate-200 transition hover:border-blue-500/40 hover:bg-[#1c232d] hover:text-blue-400"
+                >
+                    <TrendingUp size={17} />
+                    View Market
+                </Link>
             </form>
 
             <div className="mt-6 text-center">
