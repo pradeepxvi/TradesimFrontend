@@ -1,11 +1,4 @@
-import {
-    Check,
-    BriefcaseBusiness,
-    LoaderCircle,
-    Plus,
-    X,
-    Wallet,
-} from "lucide-react";
+import { Check, BriefcaseBusiness, LoaderCircle, Plus, X } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -14,6 +7,7 @@ import { sumNumericValues, toFiniteNumber } from "../../utils/finance";
 import { Portfolio } from "../../features/portfolio/api";
 import { CreateOrder } from "../../features/orders/api";
 import type { PortfolioHolding } from "../../features/portfolio/types";
+import { Wallet } from "../../features/market/api";
 
 type OrderSide = "BUY" | "SELL";
 

@@ -200,7 +200,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                         </button>
                     )}
                 </div>
-
             </aside>
         </>
     );

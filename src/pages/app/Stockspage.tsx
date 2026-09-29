@@ -11,6 +11,7 @@ import {
 import StockDetailPanel from "../../features/market/components/StockDetailPanel";
 import StockFilters from "../../features/market/components/StockFilters";
 import type { CompanyQuoteData } from "../../features/market/types";
+import { GainerLoserStockData } from "../../features/market/types";
 
 const PAGE_SIZE = 10;
 
@@ -99,7 +100,9 @@ const Stockspage = () => {
                 onSearchSubmit={() => {
                     const value = searchTerm.trim();
                     if (value) {
-                        navigate(`/stocks/${encodeURIComponent(value.toUpperCase())}`);
+                        navigate(
+                            `/stocks/${encodeURIComponent(value.toUpperCase())}`,
+                        );
                     }
                 }}
             />
@@ -215,7 +218,7 @@ const StockDetail = ({
     );
 };
 
-const StockRow = ({ stock }: { stock: GainerLooserStockData }) => {
+const StockRow = ({ stock }: { stock: GainerLoserStockData }) => {
     const positive = Number(stock.change) >= 0;
     return (
         <tr className="hover:bg-slate-800/40">
@@ -256,10 +259,10 @@ const Message = ({ text }: { text: string }) => (
     </p>
 );
 const getStocks = (
-    topGainers: GainerLooserStockData[] | undefined,
-    topLosers: GainerLooserStockData[] | undefined,
+    topGainers: GainerLoserStockData[] | undefined,
+    topLosers: GainerLoserStockData[] | undefined,
     movers:
-        | { gainers: GainerLooserStockData[]; losers: GainerLooserStockData[] }
+        | { gainers: GainerLoserStockData[]; losers: GainerLoserStockData[] }
         | undefined,
 ) => {
     const sources = [
