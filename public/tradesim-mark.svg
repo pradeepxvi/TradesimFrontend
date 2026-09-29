@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+    <path d="M111 292C76 223 95 139 158 91C220 43 305 43 369 84" stroke="#F7F7F7" stroke-width="25" stroke-linecap="round" />
+    <path d="M397 157C440 221 428 307 376 365C333 413 266 435 201 417" stroke="#00C878" stroke-width="25" stroke-linecap="round" />
+    <path d="M95 337L166 270L224 318L291 245L336 275L425 174" stroke="#00C878" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M394 181L447 161L432 215" fill="#00C878" />
+    <path d="M166 190V270" stroke="#00C878" stroke-width="8" stroke-linecap="round" />
+    <rect x="151" y="218" width="30" height="57" rx="2" fill="#00C878" />
+    <path d="M224 164V300" stroke="#F5222D" stroke-width="8" stroke-linecap="round" />
+    <rect x="209" y="196" width="30" height="72" rx="2" fill="#F5222D" />
+    <path d="M291 140V245" stroke="#00C878" stroke-width="8" stroke-linecap="round" />
+    <rect x="276" y="172" width="30" height="65" rx="2" fill="#00C878" />
+    <path d="M350 115V282" stroke="#F5222D" stroke-width="8" stroke-linecap="round" />
+    <rect x="335" y="151" width="30" height="77" rx="2" fill="#F5222D" />
+    <path d="M246 315H383C374 344 355 359 328 359H310L292 414C286 432 271 443 251 443H224L249 359H216C231 330 241 319 246 315Z" fill="#F7F7F7" />
+</svg>
