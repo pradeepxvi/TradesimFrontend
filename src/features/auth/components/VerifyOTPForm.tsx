@@ -1,5 +1,5 @@
 import type { ChangeEvent, FormEvent } from "react";
-import type { VerifyOTPData } from "../../types/auth";
+import type { VerifyOTPData } from "../types";
 import { Link } from "react-router-dom";
 
 type VerifyOTPFormProps = {

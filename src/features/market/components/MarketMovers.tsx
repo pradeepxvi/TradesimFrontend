@@ -2,7 +2,7 @@ import { ArrowDownRight, ArrowUpRight, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { MarketMovers as getMarketMovers } from "../api";
-import type { GainerLooserStockData } from "../types";
+import type { Company } from "../types";
 
 const MarketMovers = ({ title = "Market movers" }: { title?: string }) => {
     const { data, isLoading, isError } = useQuery({
@@ -66,7 +66,7 @@ const MoverList = ({
     positive = false,
 }: {
     title: string;
-    stocks: GainerLooserStockData[];
+    stocks: Company[];
     positive?: boolean;
 }) => (
     <div>
