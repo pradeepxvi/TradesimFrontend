@@ -10,8 +10,7 @@ import {
 } from "../../features/market/api";
 import StockDetailPanel from "../../features/market/components/StockDetailPanel";
 import StockFilters from "../../features/market/components/StockFilters";
-import type { CompanyQuoteData } from "../../features/market/types";
-import { GainerLoserStockData } from "../../features/market/types";
+import type { Company, CompanyQuoteData } from "../../features/market/types";
 
 const PAGE_SIZE = 10;
 
@@ -218,7 +217,7 @@ const StockDetail = ({
     );
 };
 
-const StockRow = ({ stock }: { stock: GainerLoserStockData }) => {
+const StockRow = ({ stock }: { stock: Company }) => {
     const positive = Number(stock.change) >= 0;
     return (
         <tr className="hover:bg-slate-800/40">
@@ -259,11 +258,9 @@ const Message = ({ text }: { text: string }) => (
     </p>
 );
 const getStocks = (
-    topGainers: GainerLoserStockData[] | undefined,
-    topLosers: GainerLoserStockData[] | undefined,
-    movers:
-        | { gainers: GainerLoserStockData[]; losers: GainerLoserStockData[] }
-        | undefined,
+    topGainers: Company[] | undefined,
+    topLosers: Company[] | undefined,
+    movers: { gainers: Company[]; losers: Company[] } | undefined,
 ) => {
     const sources = [
         ...(topGainers ?? []),

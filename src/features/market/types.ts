@@ -29,7 +29,7 @@ export interface StockSummaryData {
     total_transactions: number | null;
 }
 
-export interface GainerLoserStockData {
+interface GainerLoserStockData {
     symbol: string;
     name: string;
     sector: string | null;
@@ -37,6 +37,11 @@ export interface GainerLoserStockData {
     change: string | null;
     change_percent: string | null;
 }
+
+export type GainerLooserData = {
+    gainers: GainerLoserStockData[];
+    losers: GainerLoserStockData[];
+};
 
 export type Company = GainerLoserStockData;
 
@@ -78,11 +83,6 @@ export interface ChangeSummary {
     change_percent: string | null;
     date: string | null;
 }
-
-export type GainerLooserData = {
-    gainers: GainerLoserStockData[];
-    losers: GainerLoserStockData[];
-};
 
 export interface WalletResponse {
     virtual_balance: string | number;
