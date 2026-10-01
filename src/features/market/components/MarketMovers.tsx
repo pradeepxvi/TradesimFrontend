@@ -76,7 +76,7 @@ const MoverList = ({
             {title}
         </h3>
         <div className="divide-y divide-slate-800">
-            Top gainers
+            {title}
             {stocks.slice(0, 8).map((stock) => (
                 <Link
                     key={stock.symbol}

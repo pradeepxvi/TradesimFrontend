@@ -6,7 +6,7 @@ import { CancelOrder, CreateOrder, Orders } from "../../features/orders/api";
 import type { Order, OrderCreate } from "../../features/orders/types";
 import { Link } from "react-router-dom";
 
-type OrderFilter = "ALL" | "OPEN" | "COMPLETED" | "CANCELLED" | "REJECTED";
+type OrderFilter = "ALL" | "COMPLETED" | "REJECTED";
 type OrderSide = "BUY" | "SELL";
 
 const Orderspage = () => {
@@ -81,31 +81,28 @@ const Orderspage = () => {
                 <select
                     aria-label="Filter orders"
                     value={filter}
-                    onChange={(event) => setFilter(event.target.value as OrderFilter)}
+                    onChange={(event) =>
+                        setFilter(event.target.value as OrderFilter)
+                    }
                     className="stock-filter-control stock-filter-select max-w-xs"
                 >
-                    {(
-                        [
-                            "ALL",
-                            "OPEN",
-                            "COMPLETED",
-                            "CANCELLED",
-                            "REJECTED",
-                        ] as OrderFilter[]
-                    ).map((item) => {
-                        const count =
-                            item === "ALL"
-                                ? orders.length
-                                : orders.filter(
-                                      (order) =>
-                                          normalizeStatus(order.status) === item,
-                                  ).length;
-                        return (
-                            <option key={item} value={item}>
-                                {formatFilter(item)} ({count})
-                            </option>
-                        );
-                    })}
+                    {(["ALL", "COMPLETED", "REJECTED"] as OrderFilter[]).map(
+                        (item) => {
+                            const count =
+                                item === "ALL"
+                                    ? orders.length
+                                    : orders.filter(
+                                          (order) =>
+                                              normalizeStatus(order.status) ===
+                                              item,
+                                      ).length;
+                            return (
+                                <option key={item} value={item}>
+                                    {formatFilter(item)} ({count})
+                                </option>
+                            );
+                        },
+                    )}
                 </select>
             </div>
 

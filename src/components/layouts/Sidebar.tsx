@@ -171,7 +171,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                                 to="/profile"
                                 onClick={onClose}
                                 className={({ isActive }) =>
-                                    `group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "text-[#f0b90b]" : "text-slate-400 hover:bg-[#22252d] hover:text-white"}`
+                                    `group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${isActive ? "text-[#f0b90b]" : "text-slate-400 hover:bg-slate-800  hover:text-white"}`
                                 }
                             >
                                 <UserRound
